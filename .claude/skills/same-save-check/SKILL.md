@@ -21,7 +21,7 @@ Each run list is in `smoke_run.py` (`SAME_SAVE_RUNS`, `MATCH_RUNS`). A new switc
 
 ## Full test set (once per build, at the end)
 
-The checks above, plus in parallel: smoke in classic, widescreen and HD (`smoke_run.py build/cm0102_recomp $G /Users/max/Projects/cm0102/smoke-ref --mode <mode>`), `ctest -R options` in `build/`, `tests/recomp/test_load.py <exe> <data> <load program>` (build the program first, see its docstring), `tests/recomp/test_crashguards.py <exe>`, `tests/smoke/picker_check.py build/cm0102_recomp $G start.sav`. Start them from one script and write each log to a file. Wait on a file the script writes at the end.
+The checks above, plus in parallel: smoke in classic and widescreen (`smoke_run.py build/cm0102_recomp $G /Users/max/Projects/cm0102/smoke-ref --mode <mode>`), `ctest -R options` in `build/`, `tests/recomp/test_load.py <exe> <data> <load program>` (build the program first, see its docstring), `tests/recomp/test_crashguards.py <exe>`, `tests/smoke/picker_check.py build/cm0102_recomp $G start.sav`. Start them from one script and write each log to a file. Wait on a file the script writes at the end.
 
 ## Reading the results
 
