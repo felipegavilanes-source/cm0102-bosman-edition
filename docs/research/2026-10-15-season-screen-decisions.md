@@ -20,3 +20,4 @@ Settled with Max on 2026-10-15. The full grilling and the spec come before the b
 - **Season screen release (Q171):** the Choose Season screen ships with the big data and league release, so each season arrives with its own rules.
 - **Release order (Q172):** 0.5.0 the small features (crash fixes, restricted-player marker, position in the tactics view, faster screens); 0.6.0 easy online play (#45); 0.7.0 the seasons release (Choose Season screen, eras, league structures, rules, European formats, new competitions).
 - **Release order changed (Max, 2026-10-16):** the seasons release is 0.6.0 and easy online play (#45) moves to 0.7.0, because the network game is a large task.
+- **Interview of 2026-10-16 (Q231 to Q266):** the decisions are in `docs/specs/2026-10-16-seasons-0.6.0-spec.md`. They replace Q148 (one database per season, no "More versions") and the part of Q165 that kept the official seasons unchanged.
