@@ -52,6 +52,7 @@ The champman0102 forum uses BBCode. Write both forum posts in it, ready to paste
 - Say what each feature does, in plain words, for a player. Name the screen and the menu item where it opens.
 - Put the biggest player-facing features first, with the pictures. Fixes and small changes go in an "Also new" list.
 - Claim only what the tests show. Do not write "no feature changes the game's decisions" unless the release's same-save checks show it for every option. Say which options take effect only at the next start.
+- Do not write "no fan patches" in the original post, and do not list exceptions to the same-game rule there (Max removed both from the 0.5.0 post). The changelog keeps the details.
 - No public text names patch authors, even when a feature follows their patch.
 - End the thread post with what comes next (from the roadmap in `docs/HANDOVER.md`) and the line asking for bug reports with the computer and the clicks.
 - British English. No exclamation marks. Apply the humanizer skill to both posts before you show them to Max: fix every §1 to §5 tell, and remove dashes and bold labels on list items. The bold "Update: x.y.z is out" line of the Reddit update is the one bold line.
