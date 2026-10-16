@@ -1,20 +1,22 @@
 ---
 name: release-posts
-description: Writes the two posts for each Bosman Edition release, the thread post (a reply in the forum thread, with two or three pictures of what is new) and the updated original Reddit post, and makes the pictures. Use for "update post", "release post", "forum post", "thread post", "Reddit post", "original post", "announce the release", or at the end of a release slice. Max posts them himself; this skill only drafts.
+description: Writes the two posts for each Bosman Edition release on the champman0102 forum, the thread post (a reply with two or three pictures of what is new) and the updated original post (the first post of the thread), plus an optional Reddit update, and makes the pictures. Use for "update post", "release post", "forum post", "thread post", "Reddit post", "original post", "announce the release", or at the end of a release slice. Max posts them himself; this skill only drafts.
 ---
 
 # Release posts
 
-Each release gets two posts. Max posts both himself, after the release is published. Never post, and never open a site to post.
+Each release gets two posts in the Bosman Edition thread on the champman0102 forum (champman0102.co.uk). Max posts both himself, after the release is published. Never post, and never open a site to post.
 
-1. The thread post is a reply in the Bosman Edition forum thread. It has two or three pictures of the biggest new features, each with a short paragraph under it.
-2. The updated original post is the full text of the Reddit post (https://www.reddit.com/r/footballmanagergames/comments/1x6ih6l/ive_rebuilt_cm_0102_to_run_natively_on_mac/), with the feature list brought up to date and the newest release as the "Update" at the end. Max posts as u/IndividualAd6919. Reddit cannot be opened from a session, so ask Max to paste the current text when you need it. The last full text is in the previous `release-x.y.z-posts.md`.
+1. The thread post is a reply in the thread. It has two or three pictures of the biggest new features, each with a short paragraph under it. Mark each place as `[picture n: file]`; Max attaches the files.
+2. The updated original post is the new text of the first post of the thread. It explains the work (the recompile, the official 2008 files, the same-game rule and how it is tested), puts the current release first, lists what the port adds, lists every release with its date and a one-line summary, and ends with what comes next, the credits and the bug report line. Start from the original post in the previous `release-x.y.z-posts.md` and bring every part up to date.
+3. Optional: a short "Update: x.y.z is out" list for the end of the Reddit post (https://www.reddit.com/r/footballmanagergames/comments/1x6ih6l/ive_rebuilt_cm_0102_to_run_natively_on_mac/), where Max posts as u/IndividualAd6919.
 
 ## Inputs
 
 - The release section of `CHANGELOG.md` (the facts).
 - The spec of the release in `docs/specs/` (what each feature does, and its option name and default).
-- `docs/requests.md`: credit each player whose request ships, by their Reddit name, in both posts.
+- `docs/requests.md`: credit each player whose request ships, by name and where they asked (for example "gundenaf on Reddit").
+- `gh release list`: the dates of earlier releases for the list in the original post.
 - The previous `/Users/max/Projects/cm0102/release-*-posts.md` (the voice and the layout to follow).
 
 ## Output
@@ -37,5 +39,6 @@ Each release gets two posts. Max posts both himself, after the release is publis
 - Claim only what the tests show. Do not write "no feature changes the game's decisions" unless the release's same-save checks show it for every option. Say which options take effect only at the next start.
 - No public text names patch authors, even when a feature follows their patch.
 - End the thread post with what comes next (from the roadmap in `docs/HANDOVER.md`) and the line asking for bug reports with the computer and the clicks.
-- British English. No exclamation marks. Apply the humanizer skill to both posts before you show them to Max: fix every §1 to §5 tell, and remove dashes and bold labels on list items. The bold "Update: x.y.z is out" line in the Reddit post is the one bold line.
+- British English. No exclamation marks. Apply the humanizer skill to both posts before you show them to Max: fix every §1 to §5 tell, and remove dashes and bold labels on list items. The bold "Update: x.y.z is out" line of the Reddit update is the one bold line.
+- Put `[date]` where the release date goes if the release is not published yet.
 - After Max posts, add the shipped version to the rows of `docs/requests.md`.

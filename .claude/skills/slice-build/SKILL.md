@@ -1,0 +1,48 @@
+---
+name: slice-build
+description: Builds the slices of a Bosman Edition release spec with parallel worktree agents, a shared brief, two fresh review agents per slice and a merge to main when the checks pass. Use for "build the release", "build slices 1 to 5", "build the spec", "parallel agents", "run the slices", or a brief from another session that names spec slices. Stops before the release slice: Max approves every publish.
+---
+
+# Slice build
+
+The lead session plans, briefs, reviews and merges. Agents build. Read `docs/HANDOVER.md`, the spec and its research first.
+
+## 1. Before any agent starts
+
+1. Check the spec says `Status: Ready` with no open decisions. If not, stop and use the grilling skill.
+2. Add any shared test tool that every slice needs to main first, and commit it. Example: `smoke_run.py --same-save --save start.sav` was added before the 0.5.0 slices.
+3. Write one brief, `docs/research/build-brief-x.y.z.md`, from the template of the last one. It holds the shared facts (paths, build commands, the main build to compare with), the same-save checks (see the same-save skill), one paragraph per slice with its research file, its test seam and its option, the files that two slices share, and the rules. Commit it to main.
+4. Write the review brief, `docs/research/review-brief-x.y.z.md`, with two angles: spec (does it do what the spec says, can it change a decision, does off give the original) and standards (memory, registers, wrong call sites, file writes, Windows and Mac, comments and evidence). Commit it.
+
+## 2. Start the agents
+
+- One agent per slice, `isolation: worktree`, run in the background. Opus for anything a player sees, judgement or the recompiler. Sonnet for a routine slice with a clear brief.
+- The prompt names the slice and says: "First run `git merge main` (the worktree can be cut from an older commit), then read `docs/research/build-brief-x.y.z.md` and follow it." Without the merge, a worktree may miss the brief and the shared test tools, and a flag such as `--save` is ignored without an error.
+- A slice that depends on others starts when they are on main.
+
+## 3. Review each slice
+
+1. When an agent reports, start two fresh Opus reviewers with the review brief, the worktree, the branch and `git diff main...HEAD`. Give each reviewer the risk you see in the report.
+2. Send every must-fix and should-fix item back to the same agent in one message (SendMessage to its id). Ask it to merge main first, fix, test, commit and reply in at most 250 words.
+3. A large design change after review gets one more review of the new design.
+4. Look at the screenshots yourself before the merge.
+5. Read any change outside the slice's own files (for example an input change in `user32.c`) before you accept it.
+
+## 4. Merge
+
+- `git merge --no-ff <branch>` into main from the main checkout. Resolve conflicts in the shared lists (options table, `ctest` cases, `SAME_SAVE_RUNS`, `MATCH_RUNS`) by keeping both sides.
+- After each merge that touches game code, rebuild `build/` and run `--same-save --save start.sav` and `--save prematch.sav`.
+- When all slices are in, run the full test set once (the same-save skill lists it) and build Windows with MinGW to check it links.
+
+## 5. Report
+
+- Record each of Max's answers in the spec under Decisions.
+- Update `docs/HANDOVER.md`: what is merged, what is next, open questions.
+- Put every question for Max in full in the last message, after the wrap-up box.
+
+## Traps
+
+- A wait loop with `pgrep -f "<name>"` matches its own command line, so it waits for ever. Wait on a file the job writes, or on the job's own background notification.
+- Do not rebuild the main `build/` while agents compare against it, unless you tell them.
+- Test games under a load above about 20 fail on timing. Rerun a failed run alone before you call it a bug.
+- Agents must not run `rm` with a wildcard or a variable path.
