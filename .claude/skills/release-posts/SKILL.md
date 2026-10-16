@@ -45,7 +45,7 @@ Better: copy the pictures into `site-release-assets` before the publish, so `mak
 
 ## BBCode
 
-The champman0102 forum uses BBCode. Write both forum posts in it, ready to paste: `[b]...[/b]` for headings, `[size=150]...[/size]` for the title, `[url=link]text[/url]` for links, `[img]link[/img]` for pictures, and `[list][*]...[/list]` for lists. No Markdown in the forum posts. The optional Reddit update stays in Markdown.
+The champman0102 forum uses BBCode. Write both forum posts in it, ready to paste: `[b]...[/b]` for headings, `[size=150]...[/size]` for the title, `[url=link]text[/url]` for links, `[img]link[/img]` for pictures, and a plain bullet character (•) at the start of each list line. Do not use `[list]` and `[*]`: the champman0102 forum removes asterisks in pairs, so the items run together (seen on 0.5.0). No Markdown in the forum posts. The optional Reddit update stays in Markdown.
 
 ## Rules for the text
 
