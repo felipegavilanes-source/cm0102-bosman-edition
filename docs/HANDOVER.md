@@ -30,6 +30,13 @@ The lead session stopped here because its usage ran out. Everything below is on 
 - Database follow-up (loans, key players with no record Q383, the 2002/03 and 2003/04 careers, one rebuild with new signature rows): plan and steps in `/Users/max/Projects/cm0102/fm2005-work/HANDOVER.md`; the 2006/07 notes in `/Users/max/Projects/cm0102/fm2007-work/HANDOVER.md` and `FINDINGS.md`; build commands in `tools/seasons/own_db/README.md`.
 - Forum release packages for both databases (so players of the original game can use them too): a session was working on it when this account stopped. Its state is in `/Users/max/Projects/cm0102/forum-packages-work/HANDOVER.md` if that session wrote it; if the file is missing, ask Max what the packages should hold. Nothing is posted to the forum without Max.
 
+**Sessions of this task group in the Claude app (state on 2026-10-17 evening):**
+- "2004/05 database from FM 2005 facts (worktree)": done (PRs #62, #63, #64 merged). Its open follow-up is in `/Users/max/Projects/cm0102/fm2005-work/HANDOVER.md`.
+- "2006/07 database from FM2007 facts (worktree)": database done and merged; asked to write its current state and open items to `/Users/max/Projects/cm0102/fm2007-work/HANDOVER.md` (if that file still shows only the starting plan, read `fm2007-work/FINDINGS.md` and ask Max).
+- "Forum release packages for 2004/05 and 2006/07": was still running; asked to stop and write `/Users/max/Projects/cm0102/forum-packages-work/HANDOVER.md`.
+- "Register the 2006/07 season database in 0.6.0": done; its PR #61 is closed, replaced by #62.
+- "Read an outside 2004/05 database data format with REA": finished and closed for good. Its work was deleted on Max's word; never continue it.
+
 **Next slices, in order** (Opus for review and anything a player sees; Sonnet where reasonable for routine slices, Max 2026-10-17):
 1. Finish and merge slice 16, then slice 15 (re-run the base checks after each merge).
 2. In parallel after 16: slice 17 (substitutes, foreign rules, permits, windows; Sonnet build, Opus reviews), 18 (league sizes, promotion, relegation; Opus), 21 (domestic cups; Sonnet build), 22 (UEFA 2003/04 to 2008/09; Opus). Their brief sections are ready.
