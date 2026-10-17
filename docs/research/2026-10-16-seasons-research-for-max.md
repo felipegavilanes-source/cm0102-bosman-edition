@@ -2,6 +2,18 @@
 
 Date 2026-10-16. Research slices 1 to 10 of `docs/specs/2026-10-16-seasons-0.6.0-spec.md` are done. This file holds every point that needs your decision. Max answered on 2026-10-16: questions 1 to 63 are Q268 to Q330 in the spec, and Q331 is the rule of no new tiers.
 
+## Pass 3 (2026-10-17)
+
+Max answered the open questions of pass 2 (Q332 to Q339 in the spec), and pass 3 applied them:
+- Brazil keeps the 12 real state championships of the composite regions (Q332). They had a second-source check: 371 facts agree, and 52 disagreements were settled or listed in `bra.md`.
+- The Suruga Bank Championship is in, 2008 to 2019 (Q334). The CONCACAF Champions Cup rows say that the Leagues Cup places go to the next MLS clubs (Q333).
+- Real clubs that a database lacks become new club records (Q335). The lists are in each part's `.md` and `-clubs.tsv`.
+- `rules-0.6.0/eng-academy.tsv` lists the 224 academy sides of the EFL Trophy and National League Cup. 171 of them already have a record in their season's database, so adding them looks easy (Q336).
+- 109 rows in 9 parts now say that a play-off against a tier that left the game is played against a club with no division (Q337). This is the lead's reading of Max's "yes": Max can correct it.
+- The eight source splits keep their first value (Q338). The agents' backup and temporary folders are deleted (Q339).
+
+The table now has 7,101 rows. 2,968 filled facts have one publisher only, 8,356 fields are `unknown`, and 3 filled fields cite no page. No question is open.
+
 ## Pass 2 (2026-10-17)
 
 Max answered sections 1 to 8 below. His answers are Q268 to Q331 in the spec. Pass 2 applied them to every part, and a second-source pass and a retry looked for a second publisher for every single-source fact. Each part's `.md` lists every change.
