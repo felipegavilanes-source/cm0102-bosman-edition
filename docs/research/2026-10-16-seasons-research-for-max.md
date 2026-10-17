@@ -2,6 +2,52 @@
 
 Date 2026-10-16. Research slices 1 to 10 of `docs/specs/2026-10-16-seasons-0.6.0-spec.md` are done. This file holds every point that needs your decision. Max answered on 2026-10-16: questions 1 to 63 are Q268 to Q330 in the spec, and Q331 is the rule of no new tiers.
 
+## Pass 2 (2026-10-17)
+
+Max answered sections 1 to 8 below. His answers are Q268 to Q331 in the spec. Pass 2 applied them to every part, and a second-source pass and a retry looked for a second publisher for every single-source fact. Each part's `.md` lists every change.
+
+### What changed
+
+- No new tiers (Q331): Conference North and South, the Regionalliga from 2008/09, Serie D, Segunda Federación, the Portuguese fourth tier, the Dutch third tier, the Belgian fourth tier, the Welsh second tier, the Northern Irish and Irish third tiers, J3, K League 2, the Australian Championship and Série D left the table.
+- No new nations (Q288): the Leagues Cup, Campeones Cup, CONCACAF League, AFC Cup and OFC Professional League left the table.
+- Club moves now go down every tier of each nation (Q280). Clubs come from lower and spare divisions (Q279) and from database divisions whose tier ended (Q290).
+- Late tournaments play in their planned slot (Q277): Euro 2020 in summer 2020, the 2020 Copa América in 2020, the 2021 Africa Cup of Nations in January 2021, the 2023 Africa Cup of Nations and the 2023 Asian Cup in June and July 2023.
+- Brazil (Q283): the three composite codes now run the Cearense (northeast), Paraense (north) and Mato-Grossense (centre-west).
+
+### How sure the table is now
+
+- 7,074 rows in 20 parts.
+- Of the filled facts with a check, 2,277 still have only one publisher (before pass 2: about 6,300). 950 more are marked inferences. 6,691 fields are `unknown` because no page gives them.
+- 3 filled fields cite no page (`tools/research/rules_lint.py`).
+- Sources that block automatic reads (fff.fr, transfermarkt, worldfootball.net, the Irish and Northern Irish league sites) and the web search limit of 200 per agent turn are the main causes of the rest.
+
+### Open questions (pass 2)
+
+1. **Brazil:** the agent also added the other 12 state championships of those regions as new competitions (rows bra-757 to bra-1080). Keep them, or keep only the three that take the codes?
+2. **CONCACAF Champions Cup from 2024:** three places came through the Leagues Cup, which is out. Give them to the next MLS clubs in the league table?
+3. **Suruga Bank Championship (2008 to 2019):** J.League Cup winner against the Copa Sudamericana winner, only nations a game can select. Add it?
+4. **Real clubs missing from a season's database** (not reserve teams): about 200 across all parts, listed in each part's `.md`. Add them as new club records, as for reserve teams (Q289), or fill those places with clubs that have no division?
+5. **Academy sides** in the EFL Trophy (from 2016/17) and the National League Cup (from 2024/25): add them as new club records?
+6. **Play-offs against a tier that left the game** (for example Northern Ireland, and the 3. Liga against the Regionalliga): skip the play-off and use the table places, or play it against a club with no division, as for Scotland (Q284)?
+7. **Source splits that no third source settles.** The rows keep the first value. Keep these values?
+
+| Part | Row | Question | Value kept |
+|---|---|---|---|
+| sco | 111 | League Cup 2014/15 bench: 5 by the rule at the start, 7 named in the final | 5 |
+| ita | 237, 254 | Third-tier super cup name 2014/15 and 2015/16 | Supercoppa di Lega Pro |
+| hol-bel | 12 | Belgian Cup 2001/02 quarter-finals: one leg with replay, or one leg with extra time and penalties | one leg with replay (proposal: extra time and penalties) |
+| fra | 33, 51 | CFA 2 relegations 2004/05 and 2006/07: 22 or 23 | 23 |
+| rus-tur | 156 | Russian squad 2021/22: 25 or 28 | 25 |
+| gre-pol-cro | 22 | Greek Cup 2022/23: 85, 84 or 93 planned | 85 |
+| aus-jap-kor | 74 | Australia Cup 2024/25: 759 or 758 entrants | 759 |
+| club-world | 351, 355 | Club competition substitutes and bench of the late-2020 matches | the 2019/20 rules |
+
+### What went wrong in pass 2
+
+- The usage limit stopped 20 agents at about 02:50 on 2026-10-17. Each was resumed at 07:16 with its own context and checked its earlier changes first.
+- The web search limit of 200 per agent turn stopped several second-source agents. A retry pass took their lines again.
+- Agents left backup and temporary folders outside the repo: `~/.uefa-pass2.6BjE`, `~/Library/Caches/ger-pass2.6nzhO0`, the `*-pass2.*` folders in `/Users/max/Projects/cm0102/research-0.6.0/`, and many `mktemp` folders in the system temp folder. They can be deleted when you agree.
+
 ## 1. Season database table (slice 3)
 
 Approve the table in `2026-10-16-season-database-table.md`. It is the same as the starting table in the spec. No forum post reports a fault in any season database. The topics are locked and hold only the uploader's posts. The agent read all 733 posts of the support thread too. The check of September 2011 ODB found no more duplicate players than in the databases before and after it.

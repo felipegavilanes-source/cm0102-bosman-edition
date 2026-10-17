@@ -56,3 +56,16 @@ All rules files go to `docs/research/rules-0.6.0/`. Parts:
 | 10 | int-world; int-continental | World Cup, qualifiers, Confederations Cup, Olympics; continental championships, Nations Leagues and their qualifiers |
 
 Each rules part writes `<part>.tsv`, `<part>-clubs.tsv` (where club moves apply) and `<part>.md` (method, sources, missing clubs, unknowns). The lead session writes one doc per slice that links its parts, and the list for Max.
+
+## Pass 2 (2026-10-17): Max's decisions
+
+Read the section "Research decisions (Q268 to Q331)" in the spec first. Keep row ids. Run `tools/research/rules_lint.py` at the end, and leave your part with no more problems than before. Each part's `.md` gets a section "Pass 2" with every change.
+
+**Decision agent (one per part):**
+1. **No new tiers (Q331) and no new nations (Q288).** A nation's lowest tier is the lowest tier of its competition files in the original. Delete the rows, and the club rows, of every competition below that tier, and of every competition that needs a nation a game cannot select. Keep the real competitions of the existing tiers. When a real tier ends, that tier's rows from then on say `not held`.
+2. **Conflicts (Q293, Q295 and Q297 to Q327).** Settle every conflict and every open point for Max in the part's `.md` by what happened in real life, read in the light of Q272 to Q276 and Q278. Give the URL.
+3. **Club moves (Q279, Q280, Q290).** For each season with a database, go down every tier from the top to the nation's lowest tier. Where the real club count differs from the database count, list every real club of that tier in that season. The pool is clubs with no division, clubs in lower or spare divisions of that nation, and clubs of database divisions whose real tier has ended. A club moved up leaves a gap below it: fill that tier too.
+4. **Reserve and B teams (Q289).** List each real reserve or B team that a tier needs and the season's database lacks. The build adds them as new club records.
+5. **Part rules.** Brazil: replace the three composite championships with the real competitions of those regions (Q283). UEFA: two legs in 2019/20 and 2020/21 (Q294), and the names Champions Path and League Path in every season (Q296). Scotland: the pyramid play-off takes two clubs with no division (Q284). A late edition plays in its normal slot (Q277).
+
+**Second-source agent (one per part, after the decision agent):** take every check line with verdict `no second source` whose field still holds a value (not `unknown`, not an inference). Find a page of another publisher that states the value and read it today. Write `<part>.check2.tsv` (`id field verdict second_url note`). For a `disagree`, read a third source and settle it as in the Reconcile rule, and write the result into `<part>.tsv`.
