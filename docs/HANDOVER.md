@@ -8,7 +8,7 @@ The project lives in `/Users/max/Projects/cm0102`: the repo `cm0102-mac/`, `clea
 
 The lead session stopped here because its usage ran out. Everything below is on GitHub (main and two `wip/` branches) or on this Mac. Use the `slice-build` skill to go on.
 
-**Read first:** this section, `GLOSSARY.md`, the spec `docs/specs/2026-10-16-seasons-0.6.0-spec.md` (Decisions to Q360; the next free question number is Q361), `docs/research/build-brief-0.6.0.md` (one section per slice, shared facts, same-save checks, rules) and `docs/research/review-brief-0.6.0.md`. Private notes outside the repo: `/Users/max/Projects/cm0102/HANDOVER-PRIVATE.md` (read it: one task there may not go in git).
+**Read first:** this section, `GLOSSARY.md`, the spec `docs/specs/2026-10-16-seasons-0.6.0-spec.md` (Decisions to Q360; Q371 and Q372 are in the own-db spec; the next free question number is Q373), `docs/research/build-brief-0.6.0.md` (one section per slice, shared facts, same-save checks, rules) and `docs/research/review-brief-0.6.0.md`. Private notes outside the repo: `/Users/max/Projects/cm0102/HANDOVER-PRIVATE.md` (read it: one task there may not go in git).
 
 **On main (all reviewed by two Opus agents, merged, pushed, checks pass):**
 - Slice 11, season core: start year at run time, `bosman_season.dat` part in the save (written only for a non-base game), option `changing_rules` (default on). Docs `docs/research/2026-10-17-season-save-part.md`, `2026-10-17-first-season-branches.md`.
