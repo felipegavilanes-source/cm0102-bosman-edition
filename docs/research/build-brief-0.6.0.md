@@ -112,6 +112,8 @@ All four add their rule kinds to the slice 16 registry (its header names the int
 
 ### Common to slices 15b to 29
 
+Slice 22 answers (2026-10-18, spec Q369, Q370): up to 2008/09 the UEFA competitions keep the original's place brackets and entrant counts, and slice 23 encodes the real access list from 2009/10 (slice 22 leaves no encoding of it). Round names follow the real name of each season, from the season of the real rename, with a source for each name. Every UEFA, FIFA and international slice applies this to its rounds.
+
 Max answered the open points of these sections on 2026-10-17 (spec Q361 to Q368): 15b adds the Greek, Croatian, Polish and Turkish tier 1 and 2 clubs too, and an added club gets the median reputation of its division; a new division takes the extra division flag of the one it replaces; the Conference League is a new record; the Tokyo Olympics play on their planned dates in July and August 2020; the Euro 2004 silver goal is full extra time, then penalties; slice 28 builds the Gold Cup and the Finalissima. Russia stays suspended in 2027/28 (Q365). Where a section below says "Stop and report" on one of these points, use the answer.
 These facts hold for every section below. A section repeats one only when it adds a detail.
 
