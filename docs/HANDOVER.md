@@ -1,8 +1,32 @@
-# Handover, 2026-10-17 (evening)
+# Handover, 2026-10-18 (afternoon)
 
 Read this first, then `GLOSSARY.md`. v0.5.0 was published on 2026-10-16 with Mac, Windows and Linux downloads, and the site shows it. The next work is 0.6.0.
 
 The project lives in `/Users/max/Projects/cm0102`: the repo `cm0102-mac/`, `clean-3968/`, `data-3960/`, `data-3965/`, `sdl2/`, `smoke-ref/`, `test-fixtures/` (with `yeovil.sav` and `databases/`: all 49 Update Team databases unpacked, zips in `databases/zips`), `site-release-assets/`, `save-backups/`, `builds/` and `shots/`. Start sessions in `/Users/max/Projects/cm0102`. `build/` is configured with `-DCM0102_EXE=/Users/max/Projects/cm0102/clean-3968/cm0102.exe -DRECOMP_PYTHON=/Users/max/.venvs/cm0102/bin/python`.
+
+## 0.6.0 build state (2026-10-18 afternoon, written for a new account)
+
+Read this section first; the section of 2026-10-17 below is older. The lead's decision list for Max to confirm (31 items) is in `/Users/max/Projects/cm0102/lead-notes/decisions-for-max.md` (outside the repo): record the confirmed ones in the spec as Q373 on.
+
+**On main (pushed, 423ec0f):** slices 11 to 14, 16 (season change, rule registry, news), 17 (substitutes, foreign rules, work permits with the Brexit rule, windows), 21a (domestic cup round formats), 22 (UEFA 2003/04 to 2008/09, shared round names table `season_round_names`), and the box fixes (news 7797, Database 13126 and 13160, comp_stats 1664, Euro 2004 fill). Each merge passed ctest and the same-save checks against the build before it. The history was rewritten on 2026-10-18 (Max's order) to remove an outside database name: every commit ID from Q340 on changed.
+
+**Branches in progress (all local, not pushed; build on in-review branches is approved):**
+- Slices 15 and 18 together: `claude/slice-18-fb9fae` (session "0.6.0 slice 18") holds slice 15 (finished at a9e8176 on `worktree-agent-a94d9c248b2926432`) and slice 18 with its review fixes; it regenerates the expected files once for both. Next: same-save set, then merge (it also brings the UTF-8 path fix, a base game fix for accented league names on macOS).
+- Slice 19 (`claude/slice-19-02249b`), on slice 18: play-offs, splits, calendar.
+- Slice 21b (`worktree-agent-a53abeb084e1c3a35`): cups that end or pause, round counts, Coppa Italia and KNVB; reviewed, fix round sent; merges after slice 26. Slice 21c (an agent worktree): group-stage cups, four-club super cups, new cups through slice 26's module.
+- Slice 23 (`claude/slice-23-3295ac`): reviewed, fix round sent (preliminary rounds kept, real Super Cup weekdays, save and load of the Europa League hand-over).
+- Slice 24 (`claude/slice-24-72016d`), on slice 23: 24a reviewed with fixes sent; 24b (Conference League record) next.
+- Slice 26 (`claude/slice-26-d5d47b`): parts a and b reviewed, fix round sent; the module `season_comps.h` makes new competition records (911a805 on). Next 26c: December Club World Championship, 32-club Club World Cup, confederation counts, Sudamericana, FIFA Intercontinental Cup, Recopa, Suruga, ACL Two.
+- Slice 27 (`claude/slice-27-36f393`): reviewed, fix round sent (Euro qualifying places, Q152 host allocation, rules-off formats); merges before 26 and 28. Both 26 and 27 wrap 0x40f590 and the box fix and 27 both wrap 0x57c710: the merge notes are in the review messages and `slice-28-notes.md`.
+- Slice 28 (`claude/slice-28-a9e4a2`), on 27 and 26: Nations League and Euro paths; then the Gold Cup, CONCACAF Nations League and Finalissima on new records.
+- Own databases (`own-db-rebuild` in `/Users/max/Projects/cm0102/wt-own-db-0405`): squad lists, key players from FM ratings, loans, careers, reserve squads; one review round done; open: the Summer 2004 Germany box (match_man 1225 in 4 of 37 games), the Spain and Portugal tests, the final rebuild of both seasons with signature rows.
+- Not started: 15b (missing top and second tier clubs; MLS stays at 12), 20 (new divisions), 25 (league phase), 29 (48-team World Cup). Briefs are in `docs/research/build-brief-0.6.0.md`.
+
+**Bugs found on main, assigned:** UEFA Cup Schedule tab dates ("52180") and Champions Cup Phase 2 listing in 2004/05, Premier history 2010 row twice (fix branch `fix/uefa-screens` by the slice 22 agent).
+
+**Done outside the build:** the 2006/07 database is posted on the champman0102 forum (f=33, `/Users/max/Projects/cm0102/forum-packages-work/HANDOVER.md`). Screenshots for the 0.6.0 post and video: `/Users/max/Projects/cm0102/release-0.6.0-images/` with `SHOTLIST.md`. v0.5.1 (Mac fix) has site-assets.zip now, so the site shows 0.5.1.
+
+**How to run it:** test game limit 12 machine-wide, load below 18; no `pkill`; regenerate only the expected files a slice changes, the lead regenerates the full set on main; slices as sessions (Max sees them); two Opus reviews per slice; the lead runs the same-save set during review.
 
 ## 0.6.0 build state (2026-10-17 evening, written for a new account)
 
