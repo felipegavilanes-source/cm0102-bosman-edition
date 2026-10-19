@@ -21,7 +21,9 @@ Each run list is in `smoke_run.py` (`SAME_SAVE_RUNS`, `MATCH_RUNS`). A new switc
 
 ## Full test set (once per build, at the end)
 
-The checks above, plus in parallel: smoke in classic and widescreen (`smoke_run.py build/cm0102_recomp $G /Users/max/Projects/cm0102/smoke-ref --mode <mode>`), `ctest -R options` in `build/`, `tests/recomp/test_load.py <exe> <data> <load program>` (build the program first, see its docstring), `tests/recomp/test_crashguards.py <exe>`, `tests/smoke/picker_check.py build/cm0102_recomp $G start.sav`. Start them from one script and write each log to a file. Wait on a file the script writes at the end.
+The checks above, plus in parallel: smoke in classic and widescreen (`smoke_run.py build/cm0102_recomp $G /Users/max/Projects/cm0102/smoke-ref --mode <mode>`), `ctest -R options` in `build/`, `tests/recomp/test_load.py <exe> <data> <load program>` (build the program first, see its docstring), `tests/recomp/test_crashguards.py <exe>`, `tests/smoke/picker_check.py build/cm0102_recomp $G start.sav`. Start them from one script. The hook does not wrap commands inside a script, so the script writes each log to a file. A command that the hook knows gets its log from the wrapper in `/Users/max/Projects/cm0102/run-logs/`. Wait on a file the script writes at the end.
+
+Run independent commands in one tool call. Chain build and test in one command with `&&`. The wrapper prints the exit code, the error lines, the last 40 lines and the log path. Read the log file when the short view is not enough. Put `RAW=1` at the start of a command only when you need the full output in the reply.
 
 ## Reading the results
 
