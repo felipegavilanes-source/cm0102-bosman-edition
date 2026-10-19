@@ -1,0 +1,26 @@
+{
+  "promptCacheTtl": "1h",
+  "subagentPromptCacheTtl": "1h",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=\"$CLAUDE_PROJECT_DIR/.claude/hooks/bash_rewrite.py\"; [ -f \"$f\" ] && python3 -I \"$f\"; exit 0"
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=\"$CLAUDE_PROJECT_DIR/.claude/hooks/read_shrink.py\"; [ -f \"$f\" ] && python3 -I \"$f\"; exit 0"
+          }
+        ]
+      }
+    ]
+  }
+}
