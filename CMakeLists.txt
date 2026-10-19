@@ -118,6 +118,8 @@ if(NOT WIN32)
     target_compile_definitions(seasons_db_test PRIVATE
         SIGNATURES_TSV="${CMAKE_SOURCE_DIR}/docs/research/rules-0.6.0/databases-signatures.tsv")
     add_test(NAME seasons_db COMMAND seasons_db_test)
+    # Token-saving hooks and the log wrapper (docs/specs/2026-10-19-token-saving-spec.md, slice 1).
+    add_test(NAME hooks COMMAND python3 -I "${CMAKE_SOURCE_DIR}/tests/dev/test_hooks.py")
     add_test(NAME seasons_table COMMAND python3 -I "${CMAKE_SOURCE_DIR}/tools/seasons/make_db_table.py" --check)
     add_test(NAME season_credits COMMAND python3 -I "${CMAKE_SOURCE_DIR}/tests/seasons/check_credits.py")
     # Right ages and dates in every season (0.6.0 slice 11b): the C table matches the date shift tables.
