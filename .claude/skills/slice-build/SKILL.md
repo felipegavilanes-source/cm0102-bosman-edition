@@ -45,6 +45,8 @@ The lead session plans, briefs, reviews and merges. Agents build. Read `docs/HAN
 ## 6. Output rules for agents
 
 - Run independent commands in one tool call.
+- Builds go through the machine-wide queue (Max, 2026-10-19): `/Users/max/Projects/cm0102/build-slot.sh cmake --build build -j4` (any build command after the script). At most 3 builds run at once; the script waits for a free slot and keeps the exit code. Never more than `-j4`.
+- Ghidra (the rea MCP) takes 2 to 4 cores per open binary. Open a binary only when a decompile is needed, and call `close_binary` when done.
 - Chain build and test in one command, for example the build then `ctest` with `&&`.
 - A hook sends build and test output through a log wrapper. It prints the exit code, the error lines, the last 40 lines and the log path in `/Users/max/Projects/cm0102/run-logs/`. If the short view is not enough, read the log file.
 - Put `RAW=1` at the start of a command only when you need the full output in the reply.
