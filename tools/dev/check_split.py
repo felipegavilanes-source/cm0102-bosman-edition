@@ -9,7 +9,7 @@ import collections, pathlib, subprocess, sys
 
 OLD_COMMIT = '9c5036b'
 BRIEF_OLD = 'docs/research/build-brief-0.6.0.md'
-BRIEF_DIR = pathlib.Path('docs/research/build-brief-0.6.0')
+BRIEF_DIR = pathlib.Path('docs/research/brief-0.6.0')
 HAND_OLD = 'docs/HANDOVER.md'
 HAND_NEW = [pathlib.Path('docs/HANDOVER.md'), pathlib.Path('docs/history/handover-2026-10-17.md')]
 
