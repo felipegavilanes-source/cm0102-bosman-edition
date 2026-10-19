@@ -15,7 +15,7 @@ HAND_NEW = [pathlib.Path('docs/HANDOVER.md'), pathlib.Path('docs/history/handove
 
 # Lines whose words changed only to point at the new files: new line -> old line.
 EDITED = {
-    "- Not started: 15b (missing top and second tier clubs; MLS stays at 12), 20 (new divisions), 25 (league phase), 29 (48-team World Cup). Briefs are in `docs/research/build-brief-0.6.0/` (shared.md plus one file per slice).":
+    "- Not started: 15b (missing top and second tier clubs; MLS stays at 12), 20 (new divisions), 25 (league phase), 29 (48-team World Cup). Briefs are in `docs/research/brief-0.6.0/` (shared.md plus one file per slice).":
     "- Not started: 15b (missing top and second tier clubs; MLS stays at 12), 20 (new divisions), 25 (league phase), 29 (48-team World Cup). Briefs are in `docs/research/build-brief-0.6.0.md`.",
     'Read this section first; the section of 2026-10-17 is older and is in `docs/history/handover-2026-10-17.md`.':
     'Read this section first; the section of 2026-10-17 below is older.',

@@ -28,7 +28,7 @@ Read this section first; the section of 2026-10-17 is older and is in `docs/hist
 - Slice 27 (`claude/slice-27-36f393`): reviewed, fix round sent (Euro qualifying places, Q152 host allocation, rules-off formats); merges before 26 and 28. Both 26 and 27 wrap 0x40f590 and the box fix and 27 both wrap 0x57c710: the merge notes are in the review messages and `slice-28-notes.md`.
 - Slice 28 (`claude/slice-28-a9e4a2`), on 27 and 26: Nations League and Euro paths; then the Gold Cup, CONCACAF Nations League and Finalissima on new records.
 - Own databases (`own-db-rebuild` in `/Users/max/Projects/cm0102/wt-own-db-0405`): squad lists, key players from FM ratings, loans, careers, reserve squads; one review round done; open: the Summer 2004 Germany box (match_man 1225 in 4 of 37 games), the Spain and Portugal tests, the final rebuild of both seasons with signature rows.
-- Not started: 15b (missing top and second tier clubs; MLS stays at 12), 20 (new divisions), 25 (league phase), 29 (48-team World Cup). Briefs are in `docs/research/build-brief-0.6.0/` (shared.md plus one file per slice).
+- Not started: 15b (missing top and second tier clubs; MLS stays at 12), 20 (new divisions), 25 (league phase), 29 (48-team World Cup). Briefs are in `docs/research/brief-0.6.0/` (shared.md plus one file per slice).
 
 **Bugs found on main, assigned:** UEFA Cup Schedule tab dates ("52180") and Champions Cup Phase 2 listing in 2004/05, Premier history 2010 row twice (fix branch `fix/uefa-screens` by the slice 22 agent).
 
