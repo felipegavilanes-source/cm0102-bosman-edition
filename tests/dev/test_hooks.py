@@ -419,12 +419,29 @@ def test_settings():
     with open(os.path.join(ROOT, ".claude", "settings.json")) as f:
         s = json.load(f)
     check(s.get("promptCacheTtl") == "1h" and s.get("subagentPromptCacheTtl") == "1h", "settings: cache lifetime 1h")
-    hooks = {g["matcher"]: g["hooks"][0]["command"] for g in s["hooks"]["PreToolUse"]}
-    check("$CLAUDE_PROJECT_DIR/.claude/hooks/bash_rewrite.py" in hooks.get("Bash", ""), "settings: Bash hook path")
-    check("$CLAUDE_PROJECT_DIR/.claude/hooks/read_shrink.py" in hooks.get("Read", ""), "settings: Read hook path")
-    for cmd in hooks.values():
-        name = cmd.split("/")[-1].rstrip('"')
-        check(os.path.exists(os.path.join(ROOT, ".claude", "hooks", name)), f"settings: {name} exists")
+    parent = "/Users/max/Projects/cm0102/.claude/settings.json"
+    files = [(os.path.join(ROOT, ".claude", "settings.json"), "")]
+    if os.path.exists(parent):
+        files.append((parent, "cm0102-mac/"))
+    for path, prefix in files:
+        with open(path) as f:
+            cfg = json.load(f)
+        check(cfg.get("promptCacheTtl") == "1h", f"{path}: cache lifetime")
+        for g in cfg["hooks"]["PreToolUse"]:
+            cmd = g["hooks"][0]["command"]
+            script = "bash_rewrite.py" if g["matcher"] == "Bash" else "read_shrink.py"
+            check(f"$CLAUDE_PROJECT_DIR/{prefix}.claude/hooks/{script}" in cmd, f"{path}: {g['matcher']} hook path")
+            # a missing script lets the call through: exit 0, no output
+            event = json.dumps({"tool_name": g["matcher"], "tool_input": {"command": "ctest", "file_path": "/x.png"}})
+            r = subprocess.run(["/bin/sh", "-c", cmd], input=event, capture_output=True, text=True,
+                               env=dict(os.environ, CLAUDE_PROJECT_DIR="/nonexistent-project"))
+            check(r.returncode == 0 and not r.stdout and not r.stderr, f"{path}: missing {script} lets the call through",
+                  f"{r.returncode} {r.stdout} {r.stderr}")
+            # a script that exists is run, from the project folder given
+            if not prefix:
+                r = subprocess.run(["/bin/sh", "-c", cmd], input=json.dumps({"tool_name": "Bash", "tool_input": {"command": "ctest"}}),
+                                   capture_output=True, text=True, env=dict(os.environ, CLAUDE_PROJECT_DIR=ROOT))
+                check(r.returncode == 0 and (g["matcher"] != "Bash" or "run_logged.py" in r.stdout), f"{script} runs through the settings command", r.stdout + r.stderr)
 
 
 def main():

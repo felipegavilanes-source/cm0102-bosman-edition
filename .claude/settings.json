@@ -8,7 +8,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 -I \"$CLAUDE_PROJECT_DIR/.claude/hooks/bash_rewrite.py\""
+            "command": "f=\"$CLAUDE_PROJECT_DIR/.claude/hooks/bash_rewrite.py\"; [ -f \"$f\" ] && python3 -I \"$f\"; exit 0"
           }
         ]
       },
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 -I \"$CLAUDE_PROJECT_DIR/.claude/hooks/read_shrink.py\""
+            "command": "f=\"$CLAUDE_PROJECT_DIR/.claude/hooks/read_shrink.py\"; [ -f \"$f\" ] && python3 -I \"$f\"; exit 0"
           }
         ]
       }
