@@ -1,6 +1,6 @@
 # Brief for the 0.6.0 build sessions (split)
 
-This brief is split to save tokens. Read `docs/research/build-brief-0.6.0/shared.md` first, then the file of your slice. Files in `docs/research/build-brief-0.6.0/`:
+This brief is split to save tokens. Read `docs/research/build-brief-0.6.0/shared.md` first, then the file of your slice. Slices 15b to 29 also read `common-15b-to-29.md`. Files in `docs/research/build-brief-0.6.0/`:
 
 - `shared.md`: shared facts, same-save checks, files that two slices share, speed, rules, and the index of the slice files
 - `slice-11.md`: Slice 11, season core (Opus). One-way door: it fixes the save format.

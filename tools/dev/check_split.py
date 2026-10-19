@@ -17,14 +17,16 @@ HAND_NEW = [pathlib.Path('docs/HANDOVER.md'), pathlib.Path('docs/history/handove
 EDITED = {
     "- Not started: 15b (missing top and second tier clubs; MLS stays at 12), 20 (new divisions), 25 (league phase), 29 (48-team World Cup). Briefs are in `docs/research/build-brief-0.6.0/` (shared.md plus one file per slice).":
     "- Not started: 15b (missing top and second tier clubs; MLS stays at 12), 20 (new divisions), 25 (league phase), 29 (48-team World Cup). Briefs are in `docs/research/build-brief-0.6.0.md`.",
+    'Read this section first; the section of 2026-10-17 is older and is in `docs/history/handover-2026-10-17.md`.':
+    'Read this section first; the section of 2026-10-17 below is older.',
 }
 # Added lines of the handover (headings and pointers).
 ADDED_HAND = {
     '## History',
-    'Older build state (2026-10-17), facts from 0.4.1, 0.4.0 and 0.3.0, and the function map note: `docs/history/handover-2026-10-17.md`.',
+    'Older build state (2026-10-17), facts from 0.4.1, 0.4.0 and 0.3.0, and the function map note: `docs/history/handover-2026-10-17.md`. That file also holds the release notes items for slice 30, the known issues for later slices, the worktree clean-up list, the pointer to `/Users/max/Projects/cm0102/HANDOVER-PRIVATE.md`, the pointer to `docs/requests.md` and the Colima start command. Read it before slice 30 or a clean-up.',
     '## Open items',
     '# Handover history, up to 2026-10-17',
-    'Moved from `docs/HANDOVER.md` on 2026-10-19. Open work from these sections is in "Open items" of `docs/HANDOVER.md`.',
+    'Moved from `docs/HANDOVER.md` on 2026-10-19. Open work with a plain place in the list is in "Open items" of `docs/HANDOVER.md`. The rest stays here.',
 }
 
 

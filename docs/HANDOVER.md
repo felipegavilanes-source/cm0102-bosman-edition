@@ -6,7 +6,7 @@ The project lives in `/Users/max/Projects/cm0102`: the repo `cm0102-mac/`, `clea
 
 ## 0.6.0 build state (2026-10-18 afternoon, written for a new account)
 
-Read this section first; the section of 2026-10-17 below is older.
+Read this section first; the section of 2026-10-17 is older and is in `docs/history/handover-2026-10-17.md`.
 
 **PAUSED 2026-10-18 ~14:45 for the account change. Resume here.**
 1. Read every file in `/Users/max/Projects/cm0102/lead-notes/session-states/` (one per track: branch, last commit, what is done, where it stopped, open review items, next steps, exact test commands, decisions for Max). Slices 19, 26 and 27 were still writing theirs at the pause: if a file is missing, read that branch's last commits and its doc (`docs/research/2026-10-18-*.md` on the branch).
@@ -38,7 +38,7 @@ Read this section first; the section of 2026-10-17 below is older.
 
 ## History
 
-Older build state (2026-10-17), facts from 0.4.1, 0.4.0 and 0.3.0, and the function map note: `docs/history/handover-2026-10-17.md`.
+Older build state (2026-10-17), facts from 0.4.1, 0.4.0 and 0.3.0, and the function map note: `docs/history/handover-2026-10-17.md`. That file also holds the release notes items for slice 30, the known issues for later slices, the worktree clean-up list, the pointer to `/Users/max/Projects/cm0102/HANDOVER-PRIVATE.md`, the pointer to `docs/requests.md` and the Colima start command. Read it before slice 30 or a clean-up.
 
 ## Open items
 
