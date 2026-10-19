@@ -5,7 +5,7 @@ Two fresh Opus review agents read this brief for each slice. Each gets one angle
 ## What to review
 
 - The diff: `git diff main...HEAD` in the worktree the lead names. Leave out `docs/` except where the code names a doc as its evidence, and except the research docs the slice writes (slice 11: the first-season branch table and the save part proof).
-- Spec: `docs/specs/2026-10-16-seasons-0.6.0-spec.md`, the slice the lead names. Build brief: `docs/research/build-brief-0.6.0.md`. Terms: `GLOSSARY.md`. Repo rules: `CLAUDE.md`, `docs/HANDOVER.md` ("Rules").
+- Spec: `docs/specs/2026-10-16-seasons-0.6.0-spec.md`, the slice the lead names. Build brief: `docs/research/brief-0.6.0/shared.md` plus the slice file. Terms: `GLOSSARY.md`. Repo rules: `CLAUDE.md`, `docs/HANDOVER.md` ("Rules").
 
 ## Angles
 
