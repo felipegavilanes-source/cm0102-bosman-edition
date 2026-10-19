@@ -56,6 +56,12 @@ ERROR_PATTERNS = [
     r"[1-9]\d* tests? failed|\bTimeout\b",
 ]
 ERROR_RE = re.compile("|".join(f"(?:{p})" for p in ERROR_PATTERNS))
+# The decisive lines come first in the error list. Weak patterns only fill the places that are left, so
+# that expected noise (a message box that a test provokes, a timeout text) cannot push a failure out.
+DECISIVE_RE = re.compile(r"\bFAIL(ED)?\b|\*\*\*|^Traceback|^\w[\w.]*(Error|Exception|Exit|Interrupt)\b|"
+                         r"\bAssertion|\bdiffers?\b|^\s*\d+ - \S.* \(|^make(\[\d+\])?: \*\*\*|^ninja: build stopped|"
+                         r"\berror:|\bfatal error\b|^CMake Error")
+WEAK_RE = re.compile(r"\bTimeout\b|No such file or directory|Permission denied|command not found|recomp: message box")
 WARNING_RE = re.compile(r"\bwarning:")
 
 
@@ -114,20 +120,56 @@ def exit_code(child):
     return 128 - code if code < 0 else code
 
 
-def clip(text):
+def clip(text, around=None):
+    """A line for the view: at most LINE_WIDTH characters. With `around` (a regex) the cut keeps the match."""
     text = text.rstrip("\r\n")
-    if "\r" in text:                                   # progress bars: show the last state
-        text = next((p for p in reversed(text.split("\r")) if p), "")
-    if len(text) > LINE_WIDTH:
-        text = text[:LINE_WIDTH] + f"... [+{len(text) - LINE_WIDTH} chars]"
-    return text
+    if "\r" in text:                                   # progress bars: the last state; a match before it stays
+        parts = [p for p in text.split("\r") if p]
+        hits = [p for p in parts if around and around.search(p)]
+        text = " | ".join(hits + ([parts[-1]] if parts and parts[-1] not in hits else [])) if hits else \
+            (parts[-1] if parts else "")
+    if len(text) <= LINE_WIDTH:
+        return text
+    start = 0
+    m = around.search(text) if around else None
+    if m and m.start() > LINE_WIDTH - 100:
+        start = m.start() - 100
+    end = start + LINE_WIDTH
+    return ("[+%d chars] ..." % start if start else "") + text[start:end] + \
+        (f"... [+{len(text) - end} chars]" if end < len(text) else "")
+
+
+class Matches:
+    """The matched lines of one tier: the first MAX_ERROR_LINES and the last MAX_ERROR_LINES, and a count."""
+
+    def __init__(self):
+        self.first, self.last, self.count = [], [], 0
+
+    def add(self, item):
+        self.count += 1
+        if len(self.first) < MAX_ERROR_LINES:
+            self.first.append(item)
+        else:
+            self.last.append(item)
+            if len(self.last) > MAX_ERROR_LINES:
+                self.last.pop(0)
+
+    def pick(self, room):
+        """At most `room` lines: the first half and the last half of the tier."""
+        items = self.first + self.last
+        if len(items) <= room:
+            return items
+        half = room // 2
+        return items[:room - half] + items[-half:] if half else items[:room]
 
 
 def run_short(command, path, log):
     start_time = time.time()
     child = start(command, subprocess.PIPE, subprocess.STDOUT)
     forward_signals(child)
-    tail, matches, warnings, count = [], [], 0, 0
+    print(f"run_logged: log {path}", file=sys.stderr, flush=True)    # also when the run is killed
+    tail, warnings, count = [], 0, 0
+    tiers = [Matches(), Matches(), Matches()]      # decisive, other, weak
     with log:
         for raw in child.stdout:
             log.write(raw)
@@ -138,22 +180,25 @@ def run_short(command, path, log):
             if len(tail) > TAIL_LINES:
                 tail.pop(0)
             if ERROR_RE.search(line):
-                matches.append((count, line))
+                tiers[0 if DECISIVE_RE.search(line) else 2 if WEAK_RE.search(line) else 1].add((count, line))
             elif WARNING_RE.search(line):
                 warnings += 1
     child.wait()
     code = exit_code(child)
     out = [f"exit code: {code}  ({time.time() - start_time:.0f} s, {count} lines of output)"]
-    if matches:
-        shown = matches
-        if len(matches) > MAX_ERROR_LINES:       # the first failure and the last one both matter
-            half = MAX_ERROR_LINES // 2
-            shown = matches[:half] + [None] + matches[-half:]
-        out.append(f"error lines ({len(matches)}" + (f", the first {MAX_ERROR_LINES // 2} and the last "
-                   f"{MAX_ERROR_LINES // 2} shown" if len(matches) > MAX_ERROR_LINES else "") + "):")
-        for item in shown:
-            out.append(f"  ...{len(matches) - MAX_ERROR_LINES} more in the log" if item is None
-                       else f"  L{item[0]}: {clip(item[1])}")
+    total = sum(t.count for t in tiers)
+    if total:
+        shown, room = [], MAX_ERROR_LINES
+        for t in tiers:                              # the decisive lines first, the weak ones fill the rest
+            picked = t.pick(room)
+            shown += picked
+            room -= len(picked)
+        shown.sort()
+        note = f", {len(shown)} shown" if len(shown) < total else ""
+        out.append(f"error lines ({total}{note}; the rest are in the log):" if len(shown) < total
+                   else f"error lines ({total}):")
+        for n, line in shown:
+            out.append(f"  L{n}: {clip(line, ERROR_RE)}")
     elif code != 0:
         out.append("error lines: none matched. Read the last lines, or open the log.")
     if warnings:

@@ -130,6 +130,18 @@ CASES = [
     ("export A=1 && ctest", "export A=1 && " + wrapped("ctest")),
     ("set -e; make", None),
     ("make 'unclosed", None),
+    ("time make -j4", wrapped("time make -j4")),
+    ("timeout 600 ctest", wrapped("timeout 600 ctest")),
+    ("env X=1 ctest", wrapped("env X=1 ctest")),
+    ("nohup make", wrapped("nohup make")),
+    ("python3 -X utf8 tests/x_run.py", wrapped("python3 -X utf8 tests/x_run.py")),
+    ("python3 -m pytest tests/x_check.py", None),
+    ("rg -L foo src", capped("rg -L foo src")),
+    ("grep -L foo src", None),
+    ("rg -tcpp foo src", capped("rg -tcpp foo src")),
+    ("grep -emain f", capped("grep -emain f")),
+    ("for f in a b; do\n grep x \"$f\"\ndone", None),
+    ("for d in b1 b2; do\n ctest --test-dir $d\ndone", None),
 ]
 
 
@@ -294,12 +306,27 @@ for i in range(200):
 print("z.c:1:1: error: the last error")
 """)
     r = run_wrapper(f"{shlex.quote(sys.executable)} {p}", logs)
-    check("first kind 0" in r.stdout and "the last error" in r.stdout and "more in the log" in r.stdout
+    check("first kind 0" in r.stdout and "the last error" in r.stdout and "the rest are in the log" in r.stdout
           and "first kind 100" not in r.stdout.split("last ")[0], "many errors: first and last shown, count named", r.stdout[:600])
     # 10. a very long line is cut in the view, not in the log
     r = run_wrapper(f"{shlex.quote(sys.executable)} -c \"print('x.c:1: error: ' + 'y' * 5000)\"", logs)
     check(len(r.stdout) < 3000 and "chars]" in r.stdout, "long line cut in the view", str(len(r.stdout)))
     check(os.path.getsize(log_of(r)) > 5000, "long line complete in the log")
+    # 10b. review findings: a FAIL before a carriage return, a FAIL among noise, an error after character 300
+    r = run_wrapper("printf 'FAIL  same-save: differs\\r[====] 100%%\\n'", logs)
+    check("L1: FAIL  same-save: differs" in r.stdout, "FAIL before a carriage return stays", r.stdout)
+    p = write(work, "noise.py", """
+for i in range(40): print("Timeout waiting for", i)
+print("FAIL  same-save: the save differs from base")
+for i in range(40): print('recomp: message box "x": expected', i)
+for i in range(40): print("No such file or directory", i)
+""")
+    r = run_wrapper(f"{shlex.quote(sys.executable)} {p}", logs)
+    check("FAIL  same-save: the save differs from base" in r.stdout.split("last ")[0], "a FAIL among weak noise is shown", r.stdout[:800])
+    r = run_wrapper(f"{shlex.quote(sys.executable)} -c \"print('x' * 400 + ' error: boom')\"", logs)
+    check("error: boom" in r.stdout.split("last ")[0], "an error after character 300 stays in the error list", r.stdout[:800])
+    r = run_wrapper("echo 'FAIL early'; kill -9 $PPID 2>/dev/null; exit 0", logs)
+    check("run_logged: log " in r.stderr, "the log path goes to stderr at the start", r.stderr)
     # 11. the command's own stdin, working directory and environment work as before
     r = run_wrapper("cd / && pwd && echo $RUN_LOGS_DIR", logs)
     check("\n  /\n" in r.stdout and logs in r.stdout, "cd, pwd and environment inside the command", r.stdout)
@@ -384,10 +411,16 @@ def test_read_hook(work, logs):
     check(run_hook(READ_HOOK, "Read", {"file_path": os.path.join(work, "x.txt")}, env) is None, "Read: a text file is not changed")
     check(run_hook(READ_HOOK, "Read", {"file_path": os.path.join(work, "missing.png")}, env) is None, "Read: a missing file is not changed")
     check(run_hook(READ_HOOK, "Write", {"file_path": wide}, env) is None, "Read hook ignores other tools")
-    # a PNG outside the allowed folders is not copied
-    outside = os.path.join(os.path.expanduser("~"), "token_hooks_test_outside.png")
-    out = run_hook(READ_HOOK, "Read", {"file_path": outside}, env)
-    check(out is None, "Read: a file outside the cm0102 and temporary folders is not changed")
+    # a real wide PNG outside the allowed folders is not copied
+    outside_dir = tempfile.mkdtemp(prefix="token_hooks_outside_", dir=os.path.expanduser("~"))
+    try:
+        outside = os.path.join(outside_dir, "wide.png")
+        make_png(outside, 1600, 20)
+        out = run_hook(READ_HOOK, "Read", {"file_path": outside}, env)
+        check(out is None, "Read: a wide PNG outside the cm0102 and temporary folders is not changed")
+    finally:
+        os.remove(outside)
+        os.rmdir(outside_dir)
     if not shutil_which("sips"):
         print("SKIP  Read: sips is not installed here, the resize is not tested")
         return

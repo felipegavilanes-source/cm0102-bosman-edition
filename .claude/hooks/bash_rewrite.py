@@ -28,9 +28,8 @@ WRAPPER = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.a
 GREP_CAP = 100
 
 SHELL_WORDS = {"if", "then", "else", "elif", "fi", "for", "while", "until", "do", "done", "case", "esac",
-               "in", "function", "select", "time", "!", "{", "}", "[[", "exec", "eval", "source", ".",
-               "export", "unset", "alias", "cd", "set", "trap", "wait", "sudo", "xargs", "env", "nohup",
-               "timeout", "command", "builtin"}
+               "in", "function", "select", "!", "{", "}", "[[", "exec", "eval", "source", ".",
+               "export", "unset", "alias", "cd", "set", "trap", "wait", "sudo", "xargs", "command", "builtin"}
 ASSIGN_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
 PYTHON_RE = re.compile(r"^python(\d+(\.\d+)*)?$")
 SCRIPT_RE = re.compile(r"(_run\.py|_check\.py|^recomp\.py|^smoke_run\.py|^make_release\.sh)$")
@@ -161,6 +160,16 @@ def classify(text):
         if words[0].startswith("RAW="):
             return None
         words = words[1:]
+    while words and (words[0] in ("time", "nohup") or words[0] == "env" or
+                     (words[0] == "timeout" and len(words) > 2 and re.match(r"^\d+[smhd]?$", words[1]))):
+        if words[0] == "timeout":
+            words = words[2:]
+        else:
+            words = words[1:]
+        while words and ASSIGN_RE.match(words[0]):
+            if words[0].startswith("RAW="):
+                return None
+            words = words[1:]
     if not words or words[0] in SHELL_WORDS:
         return None
     first, rest = os.path.basename(words[0]), words[1:]
@@ -173,7 +182,17 @@ def classify(text):
     if first in ("grep", "egrep", "fgrep", "rg"):
         return None if grep_limited(first, rest) else "head"
     if PYTHON_RE.match(first) or first in ("bash", "sh", "zsh"):
-        script = next((w for w in rest if not w.startswith("-")), None)
+        script, skip = None, False
+        for w in rest:
+            if skip:
+                skip = False
+            elif w in ("-m", "-c"):
+                return None
+            elif w in ("-X", "-W", "-Q", "-O"):
+                skip = True
+            elif not w.startswith("-"):
+                script = w
+                break
         if script and SCRIPT_RE.search(os.path.basename(script)):
             return "run"
         return None
@@ -192,13 +211,21 @@ def grep_limited(tool, args):
         if a.startswith("--max-count=") or a.startswith("--count"):
             return True
         if a.startswith("-") and not a.startswith("--") and len(a) > 1:
-            if re.search(r"[lLcm]", a):        # a cluster such as -rl, -c, -m5, -nic
-                return True
+            for ch in a[1:]:       # a cluster such as -rl, -c, -m5, -nic; a letter that takes a value ends it
+                if ch in "lcm" or (ch == "L" and tool != "rg"):
+                    return True
+                if ch in "efABCdDtTgjME" or (ch == "r" and tool == "rg"):
+                    break
     return False
 
 
 STATE_WORDS = {"set", "declare", "typeset", "local", "unset", "source", ".", "alias", "function", "eval",
                "shopt", "setopt", "unsetopt", "readonly", "trap"}
+
+
+# A loop, an if or a function body: a variable of the loop is not exported, so the whole command stays as it is.
+BLOCK_WORDS = {"for", "while", "until", "if", "then", "else", "elif", "fi", "do", "done", "case", "esac",
+               "select", "{", "}", "[[", "!"}
 
 
 def changes_shell_state(text):
@@ -208,7 +235,8 @@ def changes_shell_state(text):
         words = words_of(text.strip())
     except Unsafe:
         return True
-    return bool(words) and (all(ASSIGN_RE.match(w) for w in words) or words[0] in STATE_WORDS)
+    return bool(words) and (all(ASSIGN_RE.match(w) for w in words) or words[0] in STATE_WORDS
+                            or words[0] in BLOCK_WORDS)
 
 
 def rewrite(command):
