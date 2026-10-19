@@ -19,11 +19,13 @@ The lead session plans, briefs, reviews and merges. Agents build. Read `docs/HAN
 - One agent per slice, `isolation: worktree`, run in the background. Opus for anything a player sees, judgement or the recompiler. Sonnet for a routine slice with a clear brief.
 - The prompt names the slice and says: "First run `git merge main` (the worktree can be cut from an older commit), then read `docs/research/build-brief-x.y.z.md` and follow it." Without the merge, a worktree may miss the brief and the shared test tools, and a flag such as `--save` is ignored without an error.
 - A slice that depends on others starts when they are on main.
+- Tell the build agent to write or update the slice's session-state file (`/Users/max/Projects/cm0102/lead-notes/session-states/slice-NN.md`) before it stops. A fresh fix agent reads that file.
+- Tell every agent the output rules in section 6.
 
 ## 3. Review each slice
 
 1. When an agent reports, start two fresh Opus reviewers with the review brief, the worktree, the branch and `git diff main...HEAD`. Give each reviewer the risk you see in the report.
-2. Send every must-fix and should-fix item back to the same agent in one message (SendMessage to its id). Ask it to merge main first, fix, test, commit and reply in at most 250 words.
+2. Send every must-fix and should-fix item to a fresh agent, not to the build agent. Give it the review list, the slice's session-state file (`/Users/max/Projects/cm0102/lead-notes/session-states/slice-NN.md`), the branch and the build agent's worktree path. The fresh agent works in that worktree. Ask it to merge main first, fix, test, commit, update the state file and reply in at most 250 words. Start a new fresh agent for each further fix round.
 3. A large design change after review gets one more review of the new design.
 4. Look at the screenshots yourself before the merge.
 5. Read any change outside the slice's own files (for example an input change in `user32.c`) before you accept it.
@@ -39,6 +41,15 @@ The lead session plans, briefs, reviews and merges. Agents build. Read `docs/HAN
 - Record each of Max's answers in the spec under Decisions.
 - Update `docs/HANDOVER.md`: what is merged, what is next, open questions.
 - Put every question for Max in full in the last message, after the wrap-up box.
+
+## 6. Output rules for agents
+
+- Run independent commands in one tool call.
+- Chain build and test in one command, for example the build then `ctest` with `&&`.
+- A hook sends build and test output through a log wrapper. It prints the exit code, the error lines, the last 40 lines and the log path in `/Users/max/Projects/cm0102/run-logs/`. If the short view is not enough, read the log file.
+- Put `RAW=1` at the start of a command only when you need the full output in the reply.
+- grep output stops at 100 lines. Use `-l` or `-c` first, then read the lines you need.
+- A screenshot that you view is cut to 1024 px. End a file name with `-full.png` when you need the full size.
 
 ## Traps
 
