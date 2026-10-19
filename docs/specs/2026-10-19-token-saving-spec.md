@@ -1,5 +1,5 @@
 # Token saving for build sessions
-Status: Ready
+Status: Shipped 2026-10-19 (merged; the measurement after the first fix rounds is open)
 
 Interview: the session of 2026-10-19 (Q1 to Q12 of this spec, all accepted as recommended). The numbers below come from the session files on this Mac for 16 to 18 October.
 
@@ -94,3 +94,8 @@ Delivers: `tools/dev/token_report.py` (Q12).
 Merge danger: two-way door. Blast radius: none for the game. It only reads session files.
 - [ ] Its figures for 16 to 18 October match the 19 October measurement within 1%.
 - [ ] After the first fix round with slices 1 to 3 merged, the lead compares tokens per turn with 16 to 18 October and writes the result in this spec.
+
+## Trial of Q6 (lead decision, 2026-10-19)
+The first review fix round after the merge goes to the build agent, as before. The next one goes to a fresh agent, as Q6 says. The lead compares what the reviewers find after each fix round and the tokens per turn (`tools/dev/token_report.py`), and writes the result here. A defect that a short view or a fresh agent caused counts against this system: remove that cut, or go back to fix rounds with the build agent.
+
+Open from slice 1: a session in default permission mode may ask before each wrapped build, and Read of a copy in `run-logs/shots-1024/` may ask in a session that is not in bypass mode. The same-save difference case rests on the unit sample, because the real run had no difference.

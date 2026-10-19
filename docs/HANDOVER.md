@@ -73,6 +73,8 @@ Older build state (2026-10-17), facts from 0.4.1, 0.4.0 and 0.3.0, and the funct
 
 ## Rules
 
+- Token saving (2026-10-19, spec `docs/specs/2026-10-19-token-saving-spec.md`): hooks send builds and tests through `tools/dev/run_logged.py` (full logs in `/Users/max/Projects/cm0102/run-logs/`), cap grep at 100 lines and shrink viewed PNGs to 1024 px. `RAW=1` turns the Bash hook off for one command. Run the Q6 trial in the spec at the next fix rounds.
+
 - Never commit the original's code or data, saves, screenshots or the logo. Downloads use the clean files only (`/Users/max/Projects/cm0102/clean-3968`, made by `tools/clean_files/`); the fan pack in `/Users/max/Downloads/Game` is never a build input.
 - No feature may change the game's decisions while the player makes the same clicks, except the team that is picked. A change of memory layout counts like opening a screen: the original's results already depend on where its memory blocks sit (Q152). Classic and widescreen saves differ for this reason, as they always have.
 - Every option is a line in `settings.txt`. Feature issues labelled `enhancement` show on the site's "Coming next" list live, so their titles are written for players. Bugs use `bug` and never show.
