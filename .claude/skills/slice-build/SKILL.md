@@ -45,6 +45,7 @@ The lead session plans, briefs, reviews and merges. Agents build. Read `docs/HAN
 ## 6. Output rules for agents
 
 - Run independent commands in one tool call.
+- Speed rules (Max, 2026-10-19 ~20:45). Keep-awake: `caffeinate -i -s` runs (PID in `/Users/max/Projects/cm0102/run-logs/caffeinate.pid`); stop it only after the 0.6.0 release with `kill $(cat /Users/max/Projects/cm0102/run-logs/caffeinate.pid)`. Merge chains together: when a later slice already holds an earlier one, merge both as one step with one same-save check (24 with 23; 28 with 26 and 27's follow-ups; 21b+21c after 26); on a failure, bisect between the two merge commits. Active slice limit 5 for now, the lead included; resume the next paused session in merge order when one merges. Above about 85 % of the 5-hour usage, start no new rounds until the reset. Small fix rounds get one Opus review; a second one only when the first finds a real problem (wrong result, crash, box, same-save difference, fact error). A first build of a slice gets its full review.
 - Builds go through the machine-wide queue (Max, 2026-10-19): `/Users/max/Projects/cm0102/build-slot.sh cmake --build build -j4` (any build command after the script). At most 3 builds run at once; the script waits for a free slot and keeps the exit code. Never more than `-j4`.
 - Ghidra (the rea MCP) takes 2 to 4 cores per open binary. Open a binary only when a decompile is needed, and call `close_binary` when done.
 - Chain build and test in one command, for example the build then `ctest` with `&&`.
