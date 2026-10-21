@@ -1,0 +1,43 @@
+name: World competitions validation
+
+on:
+  push:
+    branches:
+      - feature/world-competitions
+    paths:
+      - 'tools/world_competitions/**'
+      - 'tests/world_competitions/**'
+      - 'docs/research/rules-0.6.0/**'
+      - '.github/workflows/world-competitions.yml'
+  pull_request:
+    paths:
+      - 'tools/world_competitions/**'
+      - 'tests/world_competitions/**'
+      - 'docs/research/rules-0.6.0/**'
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Unit tests
+        run: python3 -m unittest discover -s tests/world_competitions -p 'test_*.py' -v
+      - name: Generate 2026/27 world competition audit
+        run: |
+          python3 tools/world_competitions/report.py --season 2026/27 --previous 2025/26 --out /tmp/world-competitions.md --json-out /tmp/world-competitions.json
+          test -s /tmp/world-competitions.md
+          test -s /tmp/world-competitions.json
+      - name: Upload audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: world-competitions-2026-27
+          path: |
+            /tmp/world-competitions.md
+            /tmp/world-competitions.json
