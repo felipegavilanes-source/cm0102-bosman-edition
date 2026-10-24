@@ -656,7 +656,10 @@ static void details_of(int sel, Details *d)
                                                        : NULL;
         d->row_rgb = pale_rgb;
     }
-    snprintf(d->start, sizeof d->start, "Starts July %d", d->year);
+    /* The nation-specific picker determines the real playable start date.
+     * England commonly starts in July, but a Brazil-only game can start
+     * in January. Never show a universal July promise here. */
+    snprintf(d->start, sizeof d->start, "Start date follows chosen leagues");
     snprintf(d->europe, sizeof d->europe, "%s", europe_text(d->year));
     if (state == 1) {
         static char unpack[120];
