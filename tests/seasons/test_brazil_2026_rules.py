@@ -14,17 +14,20 @@ RULES = ROOT / "docs/research/rules-0.6.0/bra.tsv"
 def brazil_2026_rules():
     with RULES.open(encoding="utf-8", newline="") as stream:
         rows = list(csv.DictReader(stream, delimiter="\t"))
+    return [row for row in rows if row["real_season"] == "2026"]
+
+
+def brazil_2026_league_rules():
     return {
-        row["comp_file"]: row for row in rows
-        if row["real_season"] == "2026"
-        and row["comp_file"] in ("bra_nat_first", "bra_nat_second")
+        row["comp_file"]: row for row in brazil_2026_rules()
+        if row["comp_file"] in ("bra_nat_first", "bra_nat_second")
     }
 
 
 class Brazil2026RulesTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.rules = brazil_2026_rules()
+        cls.rules = brazil_2026_league_rules()
 
     def test_both_divisions_exist(self):
         self.assertEqual(set(self.rules), {"bra_nat_first", "bra_nat_second"})
@@ -52,6 +55,25 @@ class Brazil2026RulesTest(unittest.TestCase):
         for fragment in ("3rd v 6th", "4th v 5th", "two-legged", "two winners"):
             self.assertIn(fragment, shape)
         self.assertNotIn("final", shape)
+
+    def test_copa_do_brasil_kept(self):
+        cups = [row for row in brazil_2026_rules() if row["comp_file"] == "bra_cup"]
+        self.assertEqual(len(cups), 1)
+        cup = cups[0]
+        self.assertEqual(cup["clubs"], "126")
+        self.assertIn("fifth round", cup["format"].lower())
+        self.assertIn("série a", cup["format"].lower())
+        self.assertIn("final", cup["format"].lower())
+
+    def test_state_championships_not_dropped(self):
+        state_rows = [row for row in brazil_2026_rules()
+                      if row["tier"].startswith("state ")]
+        # More research still needed for missing/unavailable state details,
+        # but this patch must not discard the existing 2026 research rows.
+        self.assertGreaterEqual(len(state_rows), 24)
+        names = {row["name"] for row in state_rows}
+        for state in ("Paulista", "Carioca", "Mineiro", "Gaúcho"):
+            self.assertTrue(any(state in name for name in names), state)
 
     def test_2026_calendar_year(self):
         for league in self.rules.values():
