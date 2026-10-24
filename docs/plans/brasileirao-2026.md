@@ -90,3 +90,43 @@ The historical game engine's **English Premier Division (EngPrm)** is a better s
 **Read-only live audit instrumentation:** In \`season_sizes.c\`, the existing BraNatFirst/Second \`set_up_rules\` wrapper logs club count, meetings per pair (+0x3c), calendar date slots (+0xa9), matches per club (+0xa7), stage count (+0x2c), stage index (+0x30), promotion zones (+0xbe/+0xbf), and relegations (+0xc1) only when \`RECOMP_BRAZIL_2026_AUDIT=1\`. This performs **zero writes**, so it does not risk corrupting save games. On a future runnable experimental build, capture the game's log with this option to determine where the 2002 title knockout remains active.
 
 **Important:** The above does not yet disable knockout stages in the game's running Brazilian class. The original classes' schedule still has the historic 27-date limit and a top-eight final. Removing a stage count alone, or blindly forcing +0x3c to 2, may end a season early or overrun a 27-date template. The next safe game-engine step must fix the Brazilian schedule/date allocator, stage lifecycle and save/load together, behind strict season-only guards. Do not advertise the 0.6.0 fork as a playable modern Brasileirão until an original-EXE build and 2026→2027 multi-season smoke test pass.
+
+
+## Brazilian integrated competition calendar — 2026 and 2027 (24 October 2026)
+
+**Important:** Brazil is a calendar-year football country and the generic Bosman "Choose Season" screen starts a European season in JULY of its start-year. The 2026 Brazilian official competitions are stored in the 2025/26 research row (real_season=2026). Thus a normal European 2025/26 start begins in July **2025**, before the Brazilian 2026 competition; selecting 2026/27 does not automatically start a new full Brazilian 2026 season. A new Brazil-specific January-2026 start workflow (or an explicitly supported preseason transition) is a separate REQUIRED runtime change. Merely choosing start_year=2026 and reusing the existing July start would miss the beginning of 2026 Serie A (28 January) and B (20 March). This must be solved without breaking the English/European season starts and without discarding state championships.
+
+### Official season-wide dates
+- **State leagues:** 11 Jan–8 March 2026, maximum 11 national match dates per state championship. A's season starts while states are still playing, so state/A league **windows can overlap**, though one club cannot be double-booked on the same date.
+- **Serie A:** 28 Jan–2 Dec, 38 rounds, World Cup men's interruption 11 June–19 July; 19th round starts 22 July. Standings decide champion, no title playoff, four relegated.
+- **Serie B:** from 20 March, round 38 on 14 Nov. Continues playing during men's 2026 World Cup. After league table closes: **21 and 28 Nov**, the two direct home/away promotion playoff ties. Winners of each are promoted without a final; higher regular-season ranking advances when aggregate is tied. Four bottom clubs relegated.
+- **Copa do Brasil:** from 18 Feb to single-match final 6 Dec; 126 participants in 2026, the 20 Serie A clubs enter at stage 5. Keep existing cup fixtures and qualification entries, do not replace with league rounds.
+- **Libertadores:** qualification begins 4 Feb, groups in April/May, final 28 Nov; respect club-specific match dates. Preserve qualification/entrants and ranking from the continental code.
+- **Sul-Americana:** qualification begins 4 March, groups in April/May, July knockout playoff, final 21 Nov; respect club-specific match dates.
+- **2027:** CBF published the next calendar in Oct 2026: Serie A 27 Jan–1 Dec, Serie B 20 March–27 Nov, Copa do Brasil 6 Jan–5 Dec, with a protected break **24 June–25 July 2027** for these three competitions during the Women's World Cup. Exact state and CONMEBOL 2027 windows are intentionally NOT inferred. Their already existing game fixtures must not be silently dropped.
+
+Sources: https://www.cbf.com.br/a-cbf/noticias/informes-cbf/a/cbf-anuncia-novo-calendario-do-futebol-profissional-masculino ;
+https://www.cbf.com.br/futebol-brasileiro/noticias/undefined/portuguesa-x-parnahyba/cbf-divulga-documentos-tecnicos-do-brasileirao-da-serie-b-de-2026 ;
+https://www.cbf.com.br/futebol-brasileiro/noticias/undefined/ponte-preta-x-ituano/cbf-divulga-tabela-basica-plano-geral-de-acoes-e-regulamento-especifico-da-copa-do-brasil-2026 ;
+https://ge.globo.com/rs/futebol/noticia/2025/07/28/conmebol-divulga-calendario-de-2026-final-da-libertadores-sera-em-28-de-novembro.ghtml ;
+https://www.cbf.com.br/futebol-brasileiro/noticias/noticias/campeonato-brasileiro/cbf-oficializa-calendario-do-futebol-profissional-masculino-de-2027
+
+### Code added in this experimental branch
+- src/recomp_rt/win/brazil_2026_calendar.h: explicit, source-grounded 2026 competition windows and 2027 A/B/Cup pause, immutable already-booked state/national-cup/continental fixtures, no same-club conflict, configurable calendar-day gap (3 days is a simulation preference, NOT a CBF legal minimum). Unknown 2027 state/continental dates are accepted only as *existing* fixtures, not invented as new ones.
+- src/recomp_rt/win/brazil_2026_schedule.h: generate 38 **candidate** round anchors per 2026 division; schedule 380 league fixtures around already-fixed state, Copa do Brasil, Libertadores and Sudamericana fixtures, moving only league dates by at most an explicit flex period. No changes are committed to the caller's output if the proposed schedule fails validation. Dates within the year are SIMULATED, not exact official CBF matchday dates; no claim of accurate actual 2026 club pairings.
+- tests/seasons/brazil_2026_calendar_test.c and brazil_2026_schedule_test.c: World Cup exception for Serie B, 2027 protected pause, overlapping competition windows, same-club clashes, immutable cup events, 380 matches and fail-without-partial-write.
+- tests/seasons/test_brazil_2026_rules.py additionally guards 2026 Copa do Brasil (126 clubs; Serie A enters fifth phase) and existing researched state championship rows.
+- Registered standalone tests via CMake/CTest and in .github/workflows/brasileirao-2026.yml.
+- **Standalone CI pass:** https://github.com/felipegavilanes-source/cm0102-bosman-edition/actions/runs/40103306546
+- tools/recomp/brazil_2026_legacy_audit.py: a read-only PE32 inspection script. On the locally available 3.9.68 original executable it confirmed BOTH Brazilian league classes set **1 meeting** per club pair and have a fixed **27-date** schedule template. It also confirmed the English Premier template's 38 date slots and the two different Brazil-specific knockout builders. It reads bytes only, does not execute nor distribute the proprietary game binary.
+
+### Engine integration remains a blocker, not a completed feature
+The league class vtables of the original 3.9.68 executable were checked against the actual PE:
+- Brazil A: rules 0x42a5a0, schedule 0x429b50, advance_stage 0x42a950, result 0x42abc0.
+- Brazil B: rules 0x42cb70, schedule 0x42c140, advance_stage 0x42cdd0, result 0x42d040.
+- English Premier: rules 0x574b70, schedule 0x573660 (38 slots), advance_stage 0x5a8f60 (empty).
+- English First: rules 0x572d90, schedule 0x571980, advance_stage 0x572ff0, result 0x576c50 (four-club two-leg semis plus final).
+
+**Next safe runtime milestones**: (1) add a Brazil-specific January start selection preserving other nations; (2) implement and validate a Brazil 38-date League calendar allocation and 20-club fixtures in the original 3.9.68 structure, retaining state/Cup/CONMEBOL dates and rescheduling league only when club conflicts; (3) replace old Serie A top-eight title stage with a no-playoff championship; (4) replace old Serie B top-eight stage with a two-tie/two-promotion Cup_Stage, respecting match results and save/load, no final; (5) verify CBF continental qualifications and Copa do Brasil stage 5 entry; (6) play the original executable through 2026–2027 and reload saves during national/continental cups and playoffs; (7) soak 5–10 subsequent seasons with multiple active nations.
+
+The current source-level calendar/planner is **not wired into the live original-engine fixture scheduler**. Never describe the 0.5.0 program or this experimental branch as already having modern Brazilian championships.
