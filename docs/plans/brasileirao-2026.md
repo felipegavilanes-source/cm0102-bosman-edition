@@ -74,3 +74,19 @@ This fork now has `brazil_2026_promotion_english_slots`, a small zero-based posi
 Verified external rule descriptions: https://www.cbf.com.br/futebol-brasileiro/noticias/undefined/vitoria-x-flamengo/cbf-divulga-documentos-tecnicos-do-brasileirao-da-serie-b-de-2026 ; https://ge.globo.com/pe/futebol/brasileirao-serie-b/lista/2026/02/06/serie-b-cbf-divulga-tabela-e-datas-dos-novos-playoffs-de-acesso.ghtml
 
 Further engine integration requires locating a one-round `Cup_Stage` configuration that does not auto-advance to a final, verifying the event callback contract, and running actual save/load and full-season simulation before enabling it.
+
+
+### Premier League reference for Série A: tested source milestone (24 October 2026)
+The historical game engine's **English Premier Division (EngPrm)** is a better structural comparator for Série A than the English First Division (EngFirst), which uses promotion playoffs. EngPrm's table builder allocates 20 rows and its fixture schedule uses 38 dates (original game addresses 0x574a2b and 0x57369a, documented in docs/research/2026-10-18-league-sizes.md). Do **not** reuse English relegation counts (England relegates 3; Brazil 2026 relegates 4) or August-to-May dates.
+
+**Committed and tested:**
+- \`src/recomp_rt/win/brazil_2026_league.h\`: pure-C modern profile for \`bra_nat_first\` and \`bra_nat_second\`, selected by **real calendar year >= 2026**. Both leagues have 20 clubs, two meetings per pair, 38 rounds, 380 scheduled league fixtures, and \`title_playoff_rounds = 0\`. Série A has four relegations and *no title playoffs*. Série B has two automatic + two playoff promotions and four relegations.
+- The profile carefully distinguishes actual 2026 from the data key \`2025/26\` (season-key year 2025). A caller must supply the **real edition year**, not the year from the key.
+- A deterministic 20-team 38-round circle-method reference fixture sequence; every pair meets home and away exactly once. This is a topology model, **not** the official CBF 2026 fixture date/order.
+- \`brazil_2026_fixtures_valid\` rejects missing fixtures, repeats, self-matches, duplicate rounds for a club, and wrong home/away totals.
+- \`tests/seasons/brazil_2026_league_test.c\` asserts 20/38/380, no championship knockout, exact home/away coverage, future 2027 profile, and rejected invalid fixture samples. Registered with CTest along with the existing promotion and TSV tests.
+- Source CI also syntax-checks \`season_sizes.c\`, without an original EXE. CI PASS: https://github.com/felipegavilanes-source/cm0102-bosman-edition/actions/runs/40100618494
+
+**Read-only live audit instrumentation:** In \`season_sizes.c\`, the existing BraNatFirst/Second \`set_up_rules\` wrapper logs club count, meetings per pair (+0x3c), calendar date slots (+0xa9), matches per club (+0xa7), stage count (+0x2c), stage index (+0x30), promotion zones (+0xbe/+0xbf), and relegations (+0xc1) only when \`RECOMP_BRAZIL_2026_AUDIT=1\`. This performs **zero writes**, so it does not risk corrupting save games. On a future runnable experimental build, capture the game's log with this option to determine where the 2002 title knockout remains active.
+
+**Important:** The above does not yet disable knockout stages in the game's running Brazilian class. The original classes' schedule still has the historic 27-date limit and a top-eight final. Removing a stage count alone, or blindly forcing +0x3c to 2, may end a season early or overrun a 27-date template. The next safe game-engine step must fix the Brazilian schedule/date allocator, stage lifecycle and save/load together, behind strict season-only guards. Do not advertise the 0.6.0 fork as a playable modern Brasileirão until an original-EXE build and 2026→2027 multi-season smoke test pass.
