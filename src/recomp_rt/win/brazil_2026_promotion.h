@@ -75,4 +75,21 @@ static inline int brazil_2026_promotion_apply(unsigned char *status, int count,
     return 1;
 }
 
+/* Adapter for the four club slots used by the legacy English First Division
+ * semi-final builder (0x573080): [6th, 3rd, 5th, 4th].
+ * Its first round pairs adjacent slots into exactly the two Brazilian ties.
+ * The English final and the English tie-break MUST NOT be reused for Brazil.
+ * This only provides ordering; no runtime patch or stage is installed here.
+ */
+static inline int brazil_2026_promotion_english_slots(int out[4], int slots)
+{
+    Brazil2026Tie ties[2];
+    if (!out || slots < 4 || !brazil_2026_promotion_pairs(ties, 2)) return 0;
+    out[0] = ties[0].lower_rank;
+    out[1] = ties[0].higher_rank;
+    out[2] = ties[1].lower_rank;
+    out[3] = ties[1].higher_rank;
+    return 1;
+}
+
 #endif
