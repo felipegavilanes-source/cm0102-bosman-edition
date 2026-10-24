@@ -59,3 +59,18 @@ The underlying 2002 Brazilian competition classes `BraNatFirst` and `BraNatSecon
 2. Build a save/load-safe Brazilian Série B cup stage containing exactly two independent two-leg ties, no final, with an on-disk stage object. Connect completed tie outcomes to `brazil_2026_promotion_apply` and the promotion/relegation chain.
 3. Verify 380 regular-season fixtures in both divisions, the two extra home-and-away ties, table status, four up/down, and the change into 2027 after loading saved games during the tie.
 4. Only after actual compiled-game tests and multi-season simulation pass should the feature be enabled as a normal playable option. Until then, this PR stays a draft.
+
+### England second-tier analogue (24 October 2026)
+The historical English First Division (today's Championship) is the relevant existing game-engine mechanism, **not** England's third-tier League One. The reverse-engineering documentation `docs/research/2026-10-18-playoffs-splits-calendar.md` identifies these existing entrypoints:
+- `EngFirst::create_playoff_stage` 0x573080: 4 participants seeded [6th, 3rd, 5th, 4th], with two-leg semi-finals.
+- `EngFirst` round table 0x571980: two rounds including a **final**; the final must be omitted for Brazil.
+- `Cup_Stage` ctor 0x522e00 and setup 0x51c800: potential reusable stage and match setup components, with their original save/load format.
+- The English result handler 0x576c50 marks only the **final winner** promoted; Brazil must instead mark **both semi-final winners** promoted and both losers as non-promoted.
+- The English semi-final tie-break cannot simply be used: CBF 2026 requires the higher regular-season position to advance on equal aggregate score, without penalties.
+- Legacy Brazil league classes `BraNatFirst` / `BraNatSecond` use separate calendar/fixture builders. Reusing the English stage is **not** a substitute for fixing Brazil's 38 regular-season matches.
+
+This fork now has `brazil_2026_promotion_english_slots`, a small zero-based position adapter that produces the English stage seeding [5,2,4,3]. The C unit tests assert the layout. It performs **no unsafe runtime hook**.
+
+Verified external rule descriptions: https://www.cbf.com.br/futebol-brasileiro/noticias/undefined/vitoria-x-flamengo/cbf-divulga-documentos-tecnicos-do-brasileirao-da-serie-b-de-2026 ; https://ge.globo.com/pe/futebol/brasileirao-serie-b/lista/2026/02/06/serie-b-cbf-divulga-tabela-e-datas-dos-novos-playoffs-de-acesso.ghtml
+
+Further engine integration requires locating a one-round `Cup_Stage` configuration that does not auto-advance to a final, verifying the event callback contract, and running actual save/load and full-season simulation before enabling it.
