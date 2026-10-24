@@ -133,3 +133,14 @@ The current source-level calendar/planner is **not wired into the live original-
 
 ### 24 October 2026 — starting month correction
 The January Brazilian start is already an observed part of the original game. The project **does not** require inventing a new global January launch. Keep existing nation-sensitive start date logic unchanged. Test Brazil-only 2025/26 (real 2026 season) and multiple-league selection to ensure the pre-existing start is preserved, including January state games. Source evidence: `docs/research/2026-10-16-sweep-season-end.md` lines 68–79, and `season_screen.c` currently exposes a separate static July preview label that is not the game's selection logic.
+
+
+### Engine guard and actual PE scheduling evidence — 24 Oct 2026
+The locally supplied 3.9.68 `cm0102.exe` was inspected *without execution* using PE32/x86 disassembly. The two original Brazilian schedulers are not just generic 27-round counters: they allocate **27 x 65 = 1755 bytes** for date template entries at `0x429b88` / `0x42c178` (push 0x6db) and then write 27 as their round count at `0x429b8d` / `0x42c17d`. The original's `EngPrm` scheduler allocates **38 x 65 = 2470 bytes** (push 0x9a6 at 0x573695) and writes 38 at 0x57369a. The Brazilian schedulers then initialize their 27 records with many explicit Date construction and weekday-template calls. **DO NOT** change only the count, only the meetings-per-pair flag or only the allocation: all three and the populated dates must agree, else the game can read uninitialized dates or exceed allocated memory.
+
+To support the no-playoff part safely:
+- Added `src/recomp_rt/win/brazil_2026_stage_gate.h`: requires file=bra_nat_first, edition >=2026, exactly 20 teams, 2 meetings, **38 valid date slots**, 38 expected matches (or -1 while the engine defers the computation), 1 historical title stage not yet started, and current stage=-1.
+- In the original `season_sizes_rules` runtime hook, added `brazil_2026_remove_title_stage_if_ready`: enabled ONLY with `RECOMP_BRAZIL_2026_STAGE_EXPERIMENT=1`, default OFF. If and only if all the guard conditions are true, changes only `COMP_STAGE_COUNT` from 1 to 0, suppressing the *old title knockout*; never touches Serie B, English classes, continental cups, or the 2002 mode.
+- Added `tests/seasons/brazil_2026_stage_gate_test.c` and CTest / GitHub Actions coverage. The required 38-date engine is still missing, so **this hook does not alter any playable games yet**. Its primary safety property is refusing to modify the original 27-date Brazilian competition.
+- Fixed the Choose Season tile's misleading generic `Starts July %d` preview to `Start date follows chosen leagues` in `season_screen.c`. The real nation-sensitive setup mechanism was not changed.
+- Do NOT merge the PR or enable experimental stage variable in normal gameplay until 38-date scheduler integration, game recompilation and 2026–27 save/load soak tests have passed.
