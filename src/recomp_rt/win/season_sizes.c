@@ -9,6 +9,7 @@
 #include "season_divisions.h"
 #include "season_divisions_ita.h"
 #include "brazil_2026_league.h"
+#include "brazil_2026_stage_gate.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -331,6 +332,46 @@ static void sizes_rules(uint32_t obj)
     if (open_neighbour(obj, BELOW)) set_places(obj, DOWN, DOWN_PLAYOFF, r->down, "relegation");
 }
 
+/* Opt-in integration point for removal of the *historical* Brazilian Serie A
+ * eight-team championship stage. This function writes only COMP_STAGE_COUNT
+ * and only when a future fully integrated scheduler has ALREADY installed
+ * 38 valid calendar dates and two meetings per pairing.
+ *
+ * RECOMP_BRAZIL_2026_STAGE_EXPERIMENT=1 is deliberately OFF by default.
+ * Until the 38-date runtime scheduler is built, the historical class keeps
+ * one meeting and 27 slots; this helper therefore makes ZERO changes.
+ *
+ * An in-progress stage cannot be removed: stage_now must still be -1.
+ * No change to Serie B, state tournaments, Copa do Brasil or CONMEBOL.
+ */
+static void brazil_2026_remove_title_stage_if_ready(uint32_t obj)
+{
+    const char *flag = getenv("RECOMP_BRAZIL_2026_STAGE_EXPERIMENT");
+    if (!flag || strcmp(flag, "1") || !season_game_changes() || !readable(obj)) return;
+    const char *file = season_change_file(obj);
+    if (!file || strcmp(file, "bra_nat_first")) return;
+
+    Brazil2026StageState state = {
+        (int16_t)rd16(g_mem, obj + COMP_YEAR),
+        (int16_t)rd16(g_mem, obj + COMP_CLUBS),
+        (int16_t)rd16(g_mem, obj + COMP_MEETINGS),
+        (int16_t)rd16(g_mem, obj + 0xa9u),
+        (int16_t)rd16(g_mem, obj + COMP_MATCHES),
+        (int32_t)rd32(g_mem, obj + 0x2cu),
+        (int32_t)rd32(g_mem, obj + 0x30u),
+    };
+    if (!brazil_2026_serie_a_can_remove_final(file, &state)) {
+        if (logging())
+            fprintf(stderr, "recomp: Brazil 2026: title stage not removed; %d clubs, %d meetings, "
+                    "%d dates, %d matches per club, %d stages, current %d (safe fallback)\\n",
+                    state.clubs, state.meetings, state.date_slots, state.matches_per_club,
+                    state.stages, state.current_stage);
+        return;
+    }
+    wr32(g_mem, obj + 0x2cu, 0u);
+    fprintf(stderr, "recomp: Brazil 2026: 38-date Serie A verified, old title playoff disabled\n");
+}
+
 /* Read-only runtime probe for the Brazilian legacy fixture/stage builders.
  * The original classes still allocate a 27-date one-meeting calendar and an
  * eight-team title playoff. Do not force +0x2c to zero before their fixture
@@ -367,6 +408,7 @@ void season_sizes_rules(uint32_t obj)
     sizes_rules(obj);
     if (!rt_unwinding) season_playoffs_rules(obj);   /* slice 19: a play-off in a league with none */
     if (!rt_unwinding) season_divisions_rules(obj);  /* slice 20: the places towards a new division */
+    if (!rt_unwinding) brazil_2026_remove_title_stage_if_ready(obj); /* guarded, off-by-default */
     if (!rt_unwinding) brazil_2026_audit(obj);       /* experimental read-only Brazil calendar trace */
 }
 
