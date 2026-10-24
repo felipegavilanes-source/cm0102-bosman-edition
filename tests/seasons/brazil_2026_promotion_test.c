@@ -45,7 +45,7 @@ static void test_results(void)
     /* Higher placed wins aggregate: 3-0. */
     assert(brazil_2026_promotion_winner(ties[0], 0, 1, 2, 0) == 2);
     /* Away goals do not trump better-placed team on level aggregate. */
-    assert(brazil_2026_promotion_winner(ties[0], 0, 2, 2, 0) == 2);
+    assert(brazil_2026_promotion_winner(ties[0], 1, 0, 2, 1) == 2);
     assert(brazil_2026_promotion_winner(ties[0], -1, 0, 0, 0) == -1);
 }
 
