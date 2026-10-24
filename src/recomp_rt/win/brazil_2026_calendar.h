@@ -58,7 +58,7 @@ static inline int brazil_cal_days_in_year(int year)
 
 static inline int brazil_cal_day(int year, int month, int day)
 {
-    static const int months[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31, 30, 31};
+    static const int months[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     if (year < 2001 || year > 2099 || month < 1 || month > 12) return 0;
     int limit = months[month - 1] + (month == 2 && brazil_cal_leap(year));
     if (day < 1 || day > limit) return 0;
