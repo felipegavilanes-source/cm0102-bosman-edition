@@ -7,6 +7,8 @@ on:
     paths:
       - 'src/recomp_rt/win/brazil_2026_promotion.h'
       - 'src/recomp_rt/win/brazil_2026_league.h'
+      - 'src/recomp_rt/win/brazil_2026_calendar.h'
+      - 'tests/seasons/brazil_2026_calendar_test.c'
       - 'src/recomp_rt/win/season_sizes.c'
       - 'tests/seasons/brazil_2026_league_test.c'
       - 'CMakeLists.txt'
@@ -18,6 +20,8 @@ on:
     paths:
       - 'src/recomp_rt/win/brazil_2026_promotion.h'
       - 'src/recomp_rt/win/brazil_2026_league.h'
+      - 'src/recomp_rt/win/brazil_2026_calendar.h'
+      - 'tests/seasons/brazil_2026_calendar_test.c'
       - 'src/recomp_rt/win/season_sizes.c'
       - 'tests/seasons/brazil_2026_league_test.c'
       - 'CMakeLists.txt'
@@ -50,6 +54,11 @@ jobs:
         run: |
           cc -std=c11 -fsyntax-only -Isrc/recomp_rt -Isrc/recomp_rt/win \
             src/recomp_rt/win/season_sizes.c
+      - name: Validate coexistence with states, Copa do Brasil and continental cups
+        run: |
+          cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
+            tests/seasons/brazil_2026_calendar_test.c -o /tmp/brasileirao-2026-calendar
+          /tmp/brasileirao-2026-calendar
       - name: Note test limits
         run: |
           echo 'Pass confirms standalone source-level rules only.'
