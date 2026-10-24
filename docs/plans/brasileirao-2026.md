@@ -1,6 +1,6 @@
 # Brazilian Serie A and Serie B — 2026 implementation checklist
 
-Status: design and audit only. No runtime changes have been applied in this branch yet.
+Status: isolated pure-C promotion pairing and aggregate-tiebreak helper added with standalone C tests; NOT wired into runtime or tested in a compiled game.
 
 ## Goal
 New game starts in calendar year 2026 with the 2026 Brazilian league structure while keeping original match engine and a separately playable stable v0.5 installation.
@@ -38,3 +38,8 @@ New game starts in calendar year 2026 with the 2026 Brazilian league structure w
 - https://www.cbf.com.br/futebol-brasileiro/noticias/undefined/vitoria-x-flamengo/cbf-divulga-documentos-tecnicos-do-brasileirao-da-serie-b-de-2026
 - https://stcbfsiteprdimgbrs.blob.core.windows.net/img-site/cdn/REC_Brasileiro_Serie_B_2026_85d55b9f72.pdf
 - https://stcbfsiteprdimgbrs.blob.core.windows.net/img-site/cdn/Tabela_Basica_Brasileiro_Serie_B_2026_efe6ba77b5.pdf
+
+## Progress 2026-10-24
+- Added `src/recomp_rt/win/brazil_2026_promotion.h`: zero-based pairings 3rd/6th and 4th/5th; aggregate scoring; higher-ranked side advances on level aggregate.
+- Added `tests/seasons/brazil_2026_promotion_test.c`: standalone compile-and-run assertions; not yet executed by CI.
+- Existing `season_playoffs.c` explicitly excludes two-winner playoffs; a dedicated runtime stage and promotion handling remain necessary.
