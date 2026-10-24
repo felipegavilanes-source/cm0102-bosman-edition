@@ -1,6 +1,6 @@
 # Brazilian Serie A and Serie B — 2026 implementation checklist
 
-Status: isolated pure-C promotion pairing and aggregate-tiebreak helper added with standalone C tests; NOT wired into runtime or tested in a compiled game.
+Status: standalone pure-C promotion rules, home/away pairing, and fail-closed original-league status adapter added; GitHub Actions standalone tests PASS. Live match-engine wiring and executable season tests remain NOT DONE.
 
 ## Goal
 New game starts in calendar year 2026 with the 2026 Brazilian league structure while keeping original match engine and a separately playable stable v0.5 installation.
@@ -43,3 +43,19 @@ New game starts in calendar year 2026 with the 2026 Brazilian league structure w
 - Added `src/recomp_rt/win/brazil_2026_promotion.h`: zero-based pairings 3rd/6th and 4th/5th; aggregate scoring; higher-ranked side advances on level aggregate.
 - Added `tests/seasons/brazil_2026_promotion_test.c`: standalone compile-and-run assertions; not yet executed by CI.
 - Existing `season_playoffs.c` explicitly excludes two-winner playoffs; a dedicated runtime stage and promotion handling remain necessary.
+
+## Progress — second implementation step (24 October 2026)
+- `brazil_2026_promotion_venue` assigns the lower-ranked team home in leg 1 and the higher-ranked team home in leg 2.
+- `brazil_2026_promotion_apply` is a fail-closed adapter for the game's League table-row status byte: status 0 / 5 are promoted, 1 is a play-off club and 3 is relegated. It accepts only a 20-club table, two valid winners (3rd-or-6th and 4th-or-5th), two direct promotion slots, and four correctly marked playoff rows. It changes only the two winners to promoted.
+- Expanded standalone tests verify aggregate goals, level-aggregate higher-ranking tiebreak, venues, 4 up / 4 down and rejection without partial mutations.
+- Added `.github/workflows/brasileirao-2026.yml` that executes Python source-rule tests and compiles/runs the C unit tests. **PASS**: https://github.com/felipegavilanes-source/cm0102-bosman-edition/actions/runs/40095902227
+- This is **not** a game release; the adapter does not receive actual fixture results from the game yet.
+
+### Critical engine limitation found
+The underlying 2002 Brazilian competition classes `BraNatFirst` and `BraNatSecond` are different from the generic `plain_league` covered by `season_playoffs.c`. Per `docs/research/2026-10-18-league-sizes.md`, their original engine assumes one meeting per pair and a historical top-eight knockout, instead of 20 teams with 38 league games. The existing season sizes/rules metadata alone does not remove that original format. Their `set_up_rules` entrypoints are 0x42a5a0 and 0x42cb70 (season_size_wraps.c); do not forcibly change the stage counts or match-count fields without a fixture builder and game smoke tests.
+
+### Next runtime implementation, in safe order
+1. Reverse-engineer both Brazilian fixture builders and stage builders. Design a 20-club, 38-match calendar and ensure the original top-eight knockout is disabled **only in 2026+ season games**, not in the historical 2002 game.
+2. Build a save/load-safe Brazilian Série B cup stage containing exactly two independent two-leg ties, no final, with an on-disk stage object. Connect completed tie outcomes to `brazil_2026_promotion_apply` and the promotion/relegation chain.
+3. Verify 380 regular-season fixtures in both divisions, the two extra home-and-away ties, table status, four up/down, and the change into 2027 after loading saved games during the tie.
+4. Only after actual compiled-game tests and multi-season simulation pass should the feature be enabled as a normal playable option. Until then, this PR stays a draft.
