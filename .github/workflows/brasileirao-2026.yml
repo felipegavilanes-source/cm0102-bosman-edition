@@ -1,0 +1,39 @@
+name: Brasileirao 2026 rules (standalone)
+
+on:
+  push:
+    branches:
+      - feature/brasileirao-2026
+    paths:
+      - 'src/recomp_rt/win/brazil_2026_promotion.h'
+      - 'tests/seasons/brazil_2026_promotion_test.c'
+      - 'tests/seasons/test_brazil_2026_rules.py'
+      - 'docs/research/rules-0.6.0/bra.tsv'
+      - '.github/workflows/brasileirao-2026.yml'
+  pull_request:
+    paths:
+      - 'src/recomp_rt/win/brazil_2026_promotion.h'
+      - 'tests/seasons/brazil_2026_promotion_test.c'
+      - 'tests/seasons/test_brazil_2026_rules.py'
+      - 'docs/research/rules-0.6.0/bra.tsv'
+      - '.github/workflows/brasileirao-2026.yml'
+  workflow_dispatch:
+
+jobs:
+  standalone-rules:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify static 2026 A/B season rules
+        run: python3 tests/seasons/test_brazil_2026_rules.py
+      - name: Compile and exercise two-tie promotion adapter
+        run: |
+          cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
+            tests/seasons/brazil_2026_promotion_test.c -o /tmp/brasileirao-2026-rules
+          /tmp/brasileirao-2026-rules
+      - name: Note test limits
+        run: |
+          echo 'Pass confirms standalone source-level rules only.'
+          echo 'The original game executable and season rollover are NOT covered.'
