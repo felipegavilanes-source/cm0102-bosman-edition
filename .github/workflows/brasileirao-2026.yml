@@ -8,6 +8,8 @@ on:
       - 'src/recomp_rt/win/brazil_2026_promotion.h'
       - 'src/recomp_rt/win/brazil_2026_league.h'
       - 'src/recomp_rt/win/brazil_2026_calendar.h'
+      - 'src/recomp_rt/win/brazil_2026_schedule.h'
+      - 'tests/seasons/brazil_2026_schedule_test.c'
       - 'tests/seasons/brazil_2026_calendar_test.c'
       - 'src/recomp_rt/win/season_sizes.c'
       - 'tests/seasons/brazil_2026_league_test.c'
@@ -21,6 +23,8 @@ on:
       - 'src/recomp_rt/win/brazil_2026_promotion.h'
       - 'src/recomp_rt/win/brazil_2026_league.h'
       - 'src/recomp_rt/win/brazil_2026_calendar.h'
+      - 'src/recomp_rt/win/brazil_2026_schedule.h'
+      - 'tests/seasons/brazil_2026_schedule_test.c'
       - 'tests/seasons/brazil_2026_calendar_test.c'
       - 'src/recomp_rt/win/season_sizes.c'
       - 'tests/seasons/brazil_2026_league_test.c'
@@ -59,6 +63,11 @@ jobs:
           cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
             tests/seasons/brazil_2026_calendar_test.c -o /tmp/brasileirao-2026-calendar
           /tmp/brasileirao-2026-calendar
+      - name: Plan 380 Serie A/B fixtures around existing state and cup matches
+        run: |
+          cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
+            tests/seasons/brazil_2026_schedule_test.c -o /tmp/brasileirao-2026-schedule
+          /tmp/brasileirao-2026-schedule
       - name: Note test limits
         run: |
           echo 'Pass confirms standalone source-level rules only.'
