@@ -7,6 +7,7 @@ on:
     paths:
       - 'src/recomp_rt/win/brazil_2026_promotion.h'
       - 'src/recomp_rt/win/brazil_2026_league.h'
+      - 'src/recomp_rt/win/season_sizes.c'
       - 'tests/seasons/brazil_2026_league_test.c'
       - 'CMakeLists.txt'
       - 'tests/seasons/brazil_2026_promotion_test.c'
@@ -17,6 +18,7 @@ on:
     paths:
       - 'src/recomp_rt/win/brazil_2026_promotion.h'
       - 'src/recomp_rt/win/brazil_2026_league.h'
+      - 'src/recomp_rt/win/season_sizes.c'
       - 'tests/seasons/brazil_2026_league_test.c'
       - 'CMakeLists.txt'
       - 'tests/seasons/brazil_2026_promotion_test.c'
@@ -44,6 +46,10 @@ jobs:
           cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
             tests/seasons/brazil_2026_league_test.c -o /tmp/brasileirao-2026-league
           /tmp/brasileirao-2026-league
+      - name: Syntax-check read-only Brazilian runtime audit hook
+        run: |
+          cc -std=c11 -fsyntax-only -Isrc/recomp_rt -Isrc/recomp_rt/win \
+            src/recomp_rt/win/season_sizes.c
       - name: Note test limits
         run: |
           echo 'Pass confirms standalone source-level rules only.'
