@@ -200,6 +200,8 @@ if(NOT WIN32)
     # Source-level modern Brasileirao 2026 fixtures and access rules; no game EXE needed.
     add_executable(brazil_2026_league_test tests/seasons/brazil_2026_league_test.c)
     add_test(NAME brazil_2026_league COMMAND brazil_2026_league_test)
+    add_executable(brazil_2026_calendar_test tests/seasons/brazil_2026_calendar_test.c)
+    add_test(NAME brazil_2026_calendar COMMAND brazil_2026_calendar_test)
     add_executable(brazil_2026_promotion_test tests/seasons/brazil_2026_promotion_test.c)
     add_test(NAME brazil_2026_promotion COMMAND brazil_2026_promotion_test)
     add_test(NAME brazil_2026_research
