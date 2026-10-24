@@ -6,6 +6,9 @@ on:
       - feature/brasileirao-2026
     paths:
       - 'src/recomp_rt/win/brazil_2026_promotion.h'
+      - 'src/recomp_rt/win/brazil_2026_league.h'
+      - 'tests/seasons/brazil_2026_league_test.c'
+      - 'CMakeLists.txt'
       - 'tests/seasons/brazil_2026_promotion_test.c'
       - 'tests/seasons/test_brazil_2026_rules.py'
       - 'docs/research/rules-0.6.0/bra.tsv'
@@ -13,6 +16,9 @@ on:
   pull_request:
     paths:
       - 'src/recomp_rt/win/brazil_2026_promotion.h'
+      - 'src/recomp_rt/win/brazil_2026_league.h'
+      - 'tests/seasons/brazil_2026_league_test.c'
+      - 'CMakeLists.txt'
       - 'tests/seasons/brazil_2026_promotion_test.c'
       - 'tests/seasons/test_brazil_2026_rules.py'
       - 'docs/research/rules-0.6.0/bra.tsv'
@@ -33,6 +39,11 @@ jobs:
           cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
             tests/seasons/brazil_2026_promotion_test.c -o /tmp/brasileirao-2026-rules
           /tmp/brasileirao-2026-rules
+      - name: Verify Premier-League-style double round robin and no title playoffs
+        run: |
+          cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
+            tests/seasons/brazil_2026_league_test.c -o /tmp/brasileirao-2026-league
+          /tmp/brasileirao-2026-league
       - name: Note test limits
         run: |
           echo 'Pass confirms standalone source-level rules only.'
