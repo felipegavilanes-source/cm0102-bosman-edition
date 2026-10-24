@@ -70,6 +70,19 @@ static void test_date_and_competition_windows(void)
     assert(!brazil_cal_window(2027, BRA_CAL_STATE, &w));
     assert(!brazil_cal_window(2027, BRA_CAL_LIBERTADORES, &w));
     assert(!brazil_cal_window(2027, BRA_CAL_SUDAMERICANA, &w));
+    /* Known-existing continental/state fixtures in 2027 are preserved,
+     * even while official new fixture templates are not coded here. */
+    assert(brazil_cal_existing_event_allowed(2027, BRA_CAL_STATE,
+                                             DAY(2027, 2, 10)));
+    assert(brazil_cal_existing_event_allowed(2027, BRA_CAL_LIBERTADORES,
+                                             DAY(2027, 4, 14)));
+    assert(brazil_cal_existing_event_allowed(2027, BRA_CAL_SUDAMERICANA,
+                                             DAY(2027, 8, 19)));
+    assert(!brazil_cal_allowed(2027, BRA_CAL_LIBERTADORES,
+                               DAY(2027, 4, 14))); /* no new games scheduled */
+    assert(!brazil_cal_existing_event_allowed(2027, BRA_CAL_SERIE_A,
+                                              DAY(2027, 7, 2)));
+
     assert(!brazil_cal_window(2002, BRA_CAL_SERIE_A, &w));
     assert(!brazil_cal_window(2026, BRA_CAL_SERIE_A, 0));
 }
@@ -139,6 +152,17 @@ static void test_overlap_and_reschedule(void)
     assert(!brazil_cal_find_league_day(2026, BRA_CAL_SERIE_B, 44, 45,
                                        DAY(2026, 11, 21), DAY(2026, 11, 21),
                                        DAY(2026, 11, 28), playoff_conflict, 2, 3, &chosen));
+
+    /* The 2027 continental fixture is immutable, but it still blocks a
+     * same-team national league game on that date. */
+    const BrazilCalendarEvent conmebol_2027[] = {
+        {2027, DAY(2027, 8, 19), BRA_CAL_SUDAMERICANA, 51, 55}
+    };
+    assert(brazil_cal_validate(conmebol_2027, 1, 3, &bad));
+    assert(brazil_cal_find_league_day(2027, BRA_CAL_SERIE_A, 51, 60,
+                                      DAY(2027, 8, 19), DAY(2027, 8, 17),
+                                      DAY(2027, 8, 24), conmebol_2027, 1, 3, &chosen));
+    assert(chosen == DAY(2027, 8, 22));
 
     /* Refuse fixture dates that fall in the Serie A World Cup break. */
     assert(!brazil_cal_find_league_day(2026, BRA_CAL_SERIE_A, 9, 10,
