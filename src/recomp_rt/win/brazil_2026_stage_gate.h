@@ -31,7 +31,8 @@ static inline int brazil_2026_serie_a_can_remove_final(const char *file,
     return file && s && !strcmp(file, "bra_nat_first") &&
            s->edition >= 2026 &&
            s->clubs == 20 && s->meetings == 2 &&
-           s->date_slots == 38 && s->matches_per_club == 38 &&
+           s->date_slots == 38 &&
+           (s->matches_per_club == 38 || s->matches_per_club == -1) &&
            s->stages == 1 && s->current_stage == -1;
 }
 
