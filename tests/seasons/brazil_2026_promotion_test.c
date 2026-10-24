@@ -15,6 +15,13 @@ static void test_pairing_and_venue(void)
     assert(brazil_2026_promotion_pairs(ties, 2));
     assert(ties[0].higher_rank == 2 && ties[0].lower_rank == 5);
     assert(ties[1].higher_rank == 3 && ties[1].lower_rank == 4);
+    /* Matches the England 0x573080 stage ordering: 6th, 3rd, 5th, 4th. */
+    int english_slots[4] = {-1, -1, -1, -1};
+    assert(!brazil_2026_promotion_english_slots(0, 4));
+    assert(!brazil_2026_promotion_english_slots(english_slots, 3));
+    assert(brazil_2026_promotion_english_slots(english_slots, 4));
+    assert(english_slots[0] == 5 && english_slots[1] == 2);
+    assert(english_slots[2] == 4 && english_slots[3] == 3);
     assert(brazil_2026_promotion_venue(ties[0], 0, &home, &away));
     assert(home == 5 && away == 2); /* 6th hosts 3rd */
     assert(brazil_2026_promotion_venue(ties[0], 1, &home, &away));
