@@ -197,6 +197,13 @@ if(NOT WIN32)
         src/recomp_rt/win/season_bra_names.c src/recomp_rt/win/season_bra_states_table.c)
     target_include_directories(season_bra_states_test PRIVATE src/recomp_rt/win)
     add_test(NAME season_bra_states COMMAND season_bra_states_test)
+    # Source-level modern Brasileirao 2026 fixtures and access rules; no game EXE needed.
+    add_executable(brazil_2026_league_test tests/seasons/brazil_2026_league_test.c)
+    add_test(NAME brazil_2026_league COMMAND brazil_2026_league_test)
+    add_executable(brazil_2026_promotion_test tests/seasons/brazil_2026_promotion_test.c)
+    add_test(NAME brazil_2026_promotion COMMAND brazil_2026_promotion_test)
+    add_test(NAME brazil_2026_research
+        COMMAND python3 -I "${CMAKE_SOURCE_DIR}/tests/seasons/test_brazil_2026_rules.py")
     # The substitute rule lookup (0.6.0 slice 17).
     add_executable(season_subs_test tests/seasons/test_season_subs.c src/recomp_rt/win/season_subs_rule.c
         src/recomp_rt/win/season_rules.c src/recomp_rt/host/posix.c)
