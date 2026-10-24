@@ -8,6 +8,7 @@
 #include "season_playoffs.h"
 #include "season_divisions.h"
 #include "season_divisions_ita.h"
+#include "brazil_2026_league.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -330,11 +331,43 @@ static void sizes_rules(uint32_t obj)
     if (open_neighbour(obj, BELOW)) set_places(obj, DOWN, DOWN_PLAYOFF, r->down, "relegation");
 }
 
+/* Read-only runtime probe for the Brazilian legacy fixture/stage builders.
+ * The original classes still allocate a 27-date one-meeting calendar and an
+ * eight-team title playoff. Do not force +0x2c to zero before their fixture
+ * and season-change lifecycles have been checked in a compiled game.
+ * Enabled only by RECOMP_BRAZIL_2026_AUDIT=1; no memory writes or new hooks.
+ */
+static void brazil_2026_audit(uint32_t obj)
+{
+    const char *mode = getenv("RECOMP_BRAZIL_2026_AUDIT");
+    if (!mode || strcmp(mode, "1") || !season_game_changes() || !readable(obj)) return;
+    const char *file = season_change_file(obj);
+    if (!file || (strcmp(file, "bra_nat_first") && strcmp(file, "bra_nat_second"))) return;
+
+    const int edition = (int16_t)rd16(g_mem, obj + COMP_YEAR);
+    Brazil2026LeagueProfile wanted;
+    const int modern = brazil_2026_league_profile(file, edition, &wanted);
+    const int clubs = (int16_t)rd16(g_mem, obj + COMP_CLUBS);
+    const int meetings = (int16_t)rd16(g_mem, obj + COMP_MEETINGS);
+    const int games = (int16_t)rd16(g_mem, obj + COMP_MATCHES);
+    const int stage_count = (int32_t)rd32(g_mem, obj + 0x2cu);
+    const int stage_now = (int32_t)rd32(g_mem, obj + 0x30u);
+    const int date_slots = (int16_t)rd16(g_mem, obj + 0xa9u);
+    const int up = (int8_t)g_mem[obj + UP], po = (int8_t)g_mem[obj + UP_PLAYOFF];
+    const int down = (int8_t)g_mem[obj + DOWN];
+    fprintf(stderr, "recomp: Brazil league audit: %s edition=%d clubs=%d meetings=%d dates=%d "
+                    "matches_per_club=%d stages=%d current_stage=%d up=%d play_off=%d down=%d "
+                    "modern_policy=%d expected_rounds=%d (read-only)\\n",
+            file, edition, clubs, meetings, date_slots, games, stage_count,
+            stage_now, up, po, down, modern, modern ? wanted.rounds : 0);
+}
+
 void season_sizes_rules(uint32_t obj)
 {
     sizes_rules(obj);
     if (!rt_unwinding) season_playoffs_rules(obj);   /* slice 19: a play-off in a league with none */
     if (!rt_unwinding) season_divisions_rules(obj);  /* slice 20: the places towards a new division */
+    if (!rt_unwinding) brazil_2026_audit(obj);       /* experimental read-only Brazil calendar trace */
 }
 
 /* ---- Promotion and relegation of a size change ---- */
