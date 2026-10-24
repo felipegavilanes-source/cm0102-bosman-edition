@@ -159,6 +159,21 @@ static inline int brazil_cal_allowed(int year, int kind, int day)
     return 1;
 }
 
+/* For already-existing 2027 state/continental fixtures, the exact dates
+ * are not established by this adapter. Accept their saved calendar days as
+ * immutable inputs to the clash checker, rather than deleting/rejecting them.
+ * A NEW 2027 continental/state fixture cannot be created by this module.
+ */
+static inline int brazil_cal_existing_event_allowed(int year, int kind, int day)
+{
+    BrazilCalendarWindow w;
+    if (brazil_cal_window(year, kind, &w))
+        return brazil_cal_allowed(year, kind, day);
+    return year == 2027 && day >= 1 && day <= brazil_cal_days_in_year(year) &&
+           (kind == BRA_CAL_STATE || kind == BRA_CAL_LIBERTADORES ||
+            kind == BRA_CAL_SUDAMERICANA);
+}
+
 static inline int brazil_cal_shared_club(const BrazilCalendarEvent *a,
                                         const BrazilCalendarEvent *b)
 {
@@ -179,7 +194,7 @@ static inline int brazil_cal_validate(const BrazilCalendarEvent *events,
         const BrazilCalendarEvent *a = &events[i];
         if (a->home_club < 0 || a->away_club < 0 ||
             a->home_club == a->away_club ||
-            !brazil_cal_allowed(a->year, a->competition, a->day)) {
+            !brazil_cal_existing_event_allowed(a->year, a->competition, a->day)) {
             if (bad_index) *bad_index = i;
             return 0;
         }
@@ -219,6 +234,15 @@ static inline int brazil_cal_find_league_day(int year, int kind, int home_club,
         first < 1 || last > brazil_cal_days_in_year(year) ||
         first > last || preferred < first || preferred > last)
         return 0;
+    /* Never ignore a corrupt fixture input or a wrong real calendar year. */
+    for (int i = 0; i < existing_count; ++i) {
+        if (existing[i].home_club < 0 || existing[i].away_club < 0 ||
+            existing[i].home_club == existing[i].away_club ||
+            !brazil_cal_existing_event_allowed(existing[i].year,
+                                                existing[i].competition,
+                                                existing[i].day))
+            return 0;
+    }
     for (int offset = 0; offset <= last - first; ++offset) {
         int candidate[2] = {preferred + offset, preferred - offset};
         for (int c = 0; c < (offset ? 2 : 1); ++c) {
