@@ -357,7 +357,7 @@ static void brazil_2026_audit(uint32_t obj)
     const int down = (int8_t)g_mem[obj + DOWN];
     fprintf(stderr, "recomp: Brazil league audit: %s edition=%d clubs=%d meetings=%d dates=%d "
                     "matches_per_club=%d stages=%d current_stage=%d up=%d play_off=%d down=%d "
-                    "modern_policy=%d expected_rounds=%d (read-only)\\n",
+                    "modern_policy=%d expected_rounds=%d (read-only)\n",
             file, edition, clubs, meetings, date_slots, games, stage_count,
             stage_now, up, po, down, modern, modern ? wanted.rounds : 0);
 }
