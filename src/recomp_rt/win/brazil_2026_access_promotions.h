@@ -30,6 +30,12 @@ static inline int brazil_2026_access_promotions_valid(const uint8_t *status,
         if (i >= 16 && status[i] != 3) return 0;
         if (i < 16 && status[i] == 3) return 0;
     }
-    return up == 4 && down == 4 && playoff_winners == 2;
+    /* One winner from EACH independent tie. Merely having two winners
+     * anywhere among ranks 3-6 could wrongly promote BOTH teams in the
+     * same tie (e.g. ranks 3 and 6). */
+    const int first_tie = (status[2] == 0) + (status[5] == 0);
+    const int second_tie = (status[3] == 0) + (status[4] == 0);
+    return up == 4 && down == 4 && playoff_winners == 2 &&
+           first_tie == 1 && second_tie == 1;
 }
 #endif
