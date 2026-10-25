@@ -11,6 +11,7 @@ on:
       - 'src/recomp_rt/win/brazil_2026_runtime_gate.h'
       - 'src/recomp_rt/win/season_bra_calendar.c'
       - 'tests/seasons/brazil_2026_runtime_gate_test.c'
+      - 'tests/seasons/brazil_2026_runtime_template_test.c'
       - 'tests/seasons/brazil_2026_stage_gate_test.c'
       - 'src/recomp_rt/win/brazil_2026_calendar.h'
       - 'src/recomp_rt/win/brazil_2026_schedule.h'
@@ -34,6 +35,7 @@ on:
       - 'src/recomp_rt/win/brazil_2026_runtime_gate.h'
       - 'src/recomp_rt/win/season_bra_calendar.c'
       - 'tests/seasons/brazil_2026_runtime_gate_test.c'
+      - 'tests/seasons/brazil_2026_runtime_template_test.c'
       - 'tests/seasons/brazil_2026_stage_gate_test.c'
       - 'src/recomp_rt/win/brazil_2026_calendar.h'
       - 'src/recomp_rt/win/brazil_2026_schedule.h'
@@ -106,6 +108,12 @@ jobs:
         run: |
           cc -std=c11 -fsyntax-only -Isrc/recomp_rt -Isrc/recomp_rt/win \
             src/recomp_rt/win/season_uefa_league.c
+      - name: Mock original engine and verify all 38 matchday records
+        run: |
+          cc -D_POSIX_C_SOURCE=200809L -std=c11 -Wall -Wextra -Werror -pedantic -O2 \
+            -Isrc/recomp_rt -Isrc/recomp_rt/win \
+            tests/seasons/brazil_2026_runtime_template_test.c -o /tmp/brasileirao-runtime-template
+          /tmp/brasileirao-runtime-template
       - name: Note test limits
         run: |
           echo 'Pass confirms standalone source-level rules only.'
