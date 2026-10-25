@@ -25,6 +25,7 @@ static int cup_stages, rounds_created, rounds_set_up;
 static int draw_called, match_called;
 static int allocated, freed;
 static uint32_t fixture_year;
+static uint16_t mock_english_flags = 0x204u;
 
 int season_game_changes(void) { return season_on; }
 const char *season_change_file(uint32_t obj)
@@ -40,6 +41,20 @@ void rt_jump(uint32_t target)
 {
     assert(target == 0x00576c50u);
     ++english_result;
+    /* Simulate the known 0x576c50 English result-handler effect. The real
+     * EXE was disassembled: code 1 -> status 0, code 2 -> status 0xfe.
+     * This cannot replace a true save/load and gameplay smoke test. */
+    uint32_t played = rt_arg(0);
+    int code = (int8_t)rt_arg(1);
+    for (int i = 0; i < 20; ++i)
+        if (clubs[i] == played) {
+            if (code == 1)
+                g_mem[ROWS + ROW_SIZE * (uint32_t)i + 0x37u] = 0;
+            else if (code == 2)
+                g_mem[ROWS + ROW_SIZE * (uint32_t)i + 0x37u] = 0xfe;
+            return;
+        }
+    assert(!"Unknown club in English result handler mock");
 }
 uint32_t rt_callback(uint32_t fn, int nargs, const uint32_t *args)
 {
@@ -62,7 +77,7 @@ uint32_t rt_callback(uint32_t fn, int nargs, const uint32_t *args)
         wr16(g_mem, args[2], 0);
         uint32_t table = 0x37000u;
         memset(g_mem + table, 0, 0xd0);
-        wr16(g_mem, table + 0xd, 0x200u); /* fixed pairs */
+        wr16(g_mem, table + 0xd, mock_english_flags); /* English 0x0204 */
         g_mem[table + 0x21] = 2; /* two legs */
         g_mem[table + 0x22] = 4; /* default England gap */
         return table;
@@ -91,6 +106,8 @@ uint32_t rt_callback(uint32_t fn, int nargs, const uint32_t *args)
             assert(rd32(g_mem, list + 4u * (uint32_t)i) == clubs[rank[i]]);
         assert(g_mem[0x37000u + 0x21u] == 2);
         assert(g_mem[0x37000u + 0x22u] == 7);
+        assert(rd16(g_mem, 0x37000u + 0x0du) == 0x1204u);
+        assert(brazil_2026_access_level_winner(rd16(g_mem, 0x37000u + 0x0du)) == 2);
         uint32_t stage = cpu.ecx;
         assert(stage == 0x39000u);
         wr32(g_mem, stage, 0x00969468u);
@@ -156,6 +173,7 @@ static void reset_game(int year)
     cup_stages = rounds_created = rounds_set_up = 0;
     draw_called = match_called = allocated = freed = 0;
     fixture_year = (uint32_t)year;
+    mock_english_flags = 0x204u;
 }
 
 static void test_stage(void)
@@ -173,18 +191,53 @@ static void test_stage(void)
     assert(rd32(g_mem, LEAGUE + COMP_STAGE_COUNT) == 1);
     assert(own_stage(LEAGUE));
 
+    /* Four result calls from the single two-tie stage: ranks 3 and 5
+     * (0-based 2 and 4) win, ranks 4 and 6 (3,5) lose. The English
+     * 0x576c50 winner marking must yield 2 automatic + 2 tie winners. */
+    wr32(g_mem, STACK + 4, clubs[2]);
+    wr32(g_mem, STACK + 8, 1);
+    f_0042d040();
+    wr32(g_mem, STACK + 4, clubs[5]);
+    wr32(g_mem, STACK + 8, 2);
+    f_0042d040();
+    wr32(g_mem, STACK + 4, clubs[4]);
+    wr32(g_mem, STACK + 8, 1);
+    f_0042d040();
+    wr32(g_mem, STACK + 4, clubs[3]);
+    wr32(g_mem, STACK + 8, 2);
+    f_0042d040();
+    assert(english_result == 4 && fallback_result == 0);
+    int total_up = 0;
+    for (int i = 0; i < 20; ++i) {
+        unsigned char v = g_mem[ROWS + ROW_SIZE * (uint32_t)i + 0x37u];
+        total_up += (v == 0 || v == 5);
+    }
+    assert(total_up == 4);
+    assert(g_mem[ROWS + 2 * ROW_SIZE + 0x37u] == 0);
+    assert(g_mem[ROWS + 3 * ROW_SIZE + 0x37u] == 0xfe);
+    assert(g_mem[ROWS + 4 * ROW_SIZE + 0x37u] == 0);
+    assert(g_mem[ROWS + 5 * ROW_SIZE + 0x37u] == 0xfe);
+
+    /* A saved and reloaded Cup_Stage at a new memory address must still
+     * route result messages without any process-global stage pointer. */
+    memcpy(g_mem + 0x3a000u, g_mem + 0x39000u, 0xb2u);
+    wr32(g_mem, ARR, 0x3a000u);
+    assert(own_stage(LEAGUE));
+    wr32(g_mem, STACK + 4, clubs[2]);
+    wr32(g_mem, STACK + 8, 1);
+    f_0042d040();
+    assert(english_result == 5);
+
     /* The stage has a saved Cup_Stage vtable and 1x4 identity.
      * Clearing any of those saved fields rejects promotion results. */
+    wr16(g_mem, 0x3a000u + 0x3e, 8);
     f_0042d040();
-    assert(english_result == 1 && fallback_result == 0);
-    wr16(g_mem, 0x39000u + 0x3e, 8);
-    f_0042d040();
-    assert(english_result == 1 && fallback_result == 1);
-    wr16(g_mem, 0x39000u + 0x3e, 4);
+    assert(english_result == 5 && fallback_result == 1);
+    wr16(g_mem, 0x3a000u + 0x3e, 4);
     cpu.esp = STACK;
     wr32(g_mem, STACK + 12, 0xffffffffu); /* regular league result */
     f_0042d040();
-    assert(english_result == 1 && fallback_result == 2);
+    assert(english_result == 5 && fallback_result == 2);
 }
 
 static void test_reject(void)
@@ -209,6 +262,12 @@ static void test_reject(void)
     brazil_2026_access_after_fixtures(LEAGUE);
     f_0042cdd0();
     assert(fallback_stage == 1 && cup_stages == 0);
+    reset_game(2026);
+    mock_english_flags = 0x200u; /* modified engine lacks expected flags */
+    brazil_2026_access_after_fixtures(LEAGUE);
+    f_0042cdd0();
+    assert(fallback_stage == 1 && cup_stages == 0);
+    assert(rd32(g_mem, LEAGUE + COMP_STAGE_NOW) == 0xffffffffu);
     reset_game(2026);
     unsetenv("RECOMP_BRAZIL_2026_ACCESS_EXPERIMENT");
     brazil_2026_access_after_fixtures(LEAGUE);
