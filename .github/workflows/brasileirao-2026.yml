@@ -12,6 +12,12 @@ on:
       - 'src/recomp_rt/win/season_bra_calendar.c'
       - 'tests/seasons/brazil_2026_runtime_gate_test.c'
       - 'tests/seasons/brazil_2026_runtime_template_test.c'
+      - 'src/recomp_rt/win/brazil_2026_fixture_tracker.h'
+      - 'src/recomp_rt/win/brazil_2026_fixture_audit.h'
+      - 'src/recomp_rt/win/brazil_2026_fixture_audit.c'
+      - 'tests/seasons/brazil_2026_fixture_tracker_test.c'
+      - 'tests/seasons/brazil_2026_fixture_audit_test.c'
+      - 'src/recomp_rt/win/season_kind_cup_breaks.c'
       - 'tests/seasons/brazil_2026_stage_gate_test.c'
       - 'src/recomp_rt/win/brazil_2026_calendar.h'
       - 'src/recomp_rt/win/brazil_2026_schedule.h'
@@ -36,6 +42,12 @@ on:
       - 'src/recomp_rt/win/season_bra_calendar.c'
       - 'tests/seasons/brazil_2026_runtime_gate_test.c'
       - 'tests/seasons/brazil_2026_runtime_template_test.c'
+      - 'src/recomp_rt/win/brazil_2026_fixture_tracker.h'
+      - 'src/recomp_rt/win/brazil_2026_fixture_audit.h'
+      - 'src/recomp_rt/win/brazil_2026_fixture_audit.c'
+      - 'tests/seasons/brazil_2026_fixture_tracker_test.c'
+      - 'tests/seasons/brazil_2026_fixture_audit_test.c'
+      - 'src/recomp_rt/win/season_kind_cup_breaks.c'
       - 'tests/seasons/brazil_2026_stage_gate_test.c'
       - 'src/recomp_rt/win/brazil_2026_calendar.h'
       - 'src/recomp_rt/win/brazil_2026_schedule.h'
@@ -114,6 +126,19 @@ jobs:
             -Isrc/recomp_rt -Isrc/recomp_rt/win \
             tests/seasons/brazil_2026_runtime_template_test.c -o /tmp/brasileirao-runtime-template
           /tmp/brasileirao-runtime-template
+      - name: Audit real fixture-manager add callbacks in simulated 380-match seasons
+        run: |
+          cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
+            tests/seasons/brazil_2026_fixture_tracker_test.c -o /tmp/brasileirao-fixture-tracker
+          /tmp/brasileirao-fixture-tracker
+          cc -D_POSIX_C_SOURCE=200809L -std=c11 -Wall -Wextra -Werror -pedantic -O2 \
+            -Isrc/recomp_rt -Isrc/recomp_rt/win \
+            tests/seasons/brazil_2026_fixture_audit_test.c -o /tmp/brasileirao-fixture-audit
+          /tmp/brasileirao-fixture-audit
+          cc -std=c11 -fsyntax-only -Isrc/recomp_rt -Isrc/recomp_rt/win \
+            src/recomp_rt/win/brazil_2026_fixture_audit.c
+          cc -std=c11 -fsyntax-only -Isrc/recomp_rt -Isrc/recomp_rt/win \
+            src/recomp_rt/win/season_kind_cup_breaks.c
       - name: Note test limits
         run: |
           echo 'Pass confirms standalone source-level rules only.'
