@@ -19,6 +19,9 @@ on:
       - 'src/recomp_rt/win/brazil_2026_access.h'
       - 'src/recomp_rt/win/brazil_2026_access_gate.h'
       - 'src/recomp_rt/win/brazil_2026_promotion_round.h'
+      - 'src/recomp_rt/win/brazil_2026_access_promotions.h'
+      - 'tests/seasons/brazil_2026_access_promotions_test.c'
+      - 'tools/recomp/brazil_2026_cup_tiebreak_audit.py'
       - 'tests/seasons/brazil_2026_promotion_round_test.c'
       - 'tests/seasons/brazil_2026_access_gate_test.c'
       - 'tests/seasons/brazil_2026_access_stage_test.c'
@@ -56,6 +59,9 @@ on:
       - 'src/recomp_rt/win/brazil_2026_access.h'
       - 'src/recomp_rt/win/brazil_2026_access_gate.h'
       - 'src/recomp_rt/win/brazil_2026_promotion_round.h'
+      - 'src/recomp_rt/win/brazil_2026_access_promotions.h'
+      - 'tests/seasons/brazil_2026_access_promotions_test.c'
+      - 'tools/recomp/brazil_2026_cup_tiebreak_audit.py'
       - 'tests/seasons/brazil_2026_promotion_round_test.c'
       - 'tests/seasons/brazil_2026_access_gate_test.c'
       - 'tests/seasons/brazil_2026_access_stage_test.c'
@@ -169,6 +175,12 @@ jobs:
           cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
             tests/seasons/brazil_2026_promotion_round_test.c -o /tmp/brazil-cbf-tiebreak
           /tmp/brazil-cbf-tiebreak
+      - name: Validate four up and four down at Brazilian promotion chain
+        run: |
+          cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
+            tests/seasons/brazil_2026_access_promotions_test.c -o /tmp/brazil-access-promotions
+          /tmp/brazil-access-promotions
+          python3 -m py_compile tools/recomp/brazil_2026_cup_tiebreak_audit.py
       - name: Note test limits
         run: |
           echo 'Pass confirms standalone source-level rules only.'
