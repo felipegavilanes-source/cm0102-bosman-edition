@@ -214,6 +214,16 @@ static void test_stage(void)
         total_up += (v == 0 || v == 5);
     }
     assert(total_up == 4);
+    /* The inter-division chain sees four relegated rows at 17-20.
+     * Confirm the four-up/four-down checker against the actual original
+     * League table's noncontiguous status bytes. */
+    for (int i = 16; i < 20; ++i)
+        g_mem[ROWS + (uint32_t)i * ROW_SIZE + 0x37u] = 3;
+    uint8_t status[20];
+    for (int i = 0; i < 20; ++i)
+        status[i] = g_mem[ROWS + (uint32_t)i * ROW_SIZE + 0x37u];
+    assert(brazil_2026_access_promotions_valid(status, 20));
+    brazil_2026_access_audit_promotion(LEAGUE); /* read-only */
     assert(g_mem[ROWS + 2 * ROW_SIZE + 0x37u] == 0);
     assert(g_mem[ROWS + 3 * ROW_SIZE + 0x37u] == 0xfe);
     assert(g_mem[ROWS + 4 * ROW_SIZE + 0x37u] == 0);
