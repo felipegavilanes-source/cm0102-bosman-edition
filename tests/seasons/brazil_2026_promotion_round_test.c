@@ -36,10 +36,10 @@ int main(void)
     Brazil2026Tie ties[2];
     assert(brazil_2026_promotion_pairs(ties, 2));
     /* Aggregate tied: 3rd/4th advances regardless of away goals. */
-    assert(brazil_2026_promotion_winner(ties[0], 2, 0, 0, 2) == 2);
+    assert(brazil_2026_promotion_winner(ties[0], 0, 1, 2, 3) == 2);
     assert(brazil_2026_promotion_winner(ties[1], 1, 1, 1, 1) == 3);
     /* Lower-placed side still advances on a strictly better aggregate. */
     assert(brazil_2026_promotion_winner(ties[0], 3, 0, 0, 1) == 5);
-    assert(brazil_2026_promotion_winner(ties[1], 2, 1, 2, 0) == 4);
+    assert(brazil_2026_promotion_winner(ties[1], 2, 1, 0, 2) == 4);
     return 0;
 }
