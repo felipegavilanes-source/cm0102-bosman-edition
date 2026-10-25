@@ -17,6 +17,8 @@ on:
       - 'tests/seasons/brazil_2026_schedule_test.c'
       - 'tests/seasons/brazil_2026_calendar_test.c'
       - 'src/recomp_rt/win/season_sizes.c'
+      - 'src/recomp_rt/win/season_sizes.h'
+      - 'src/recomp_rt/win/season_uefa_league.c'
       - 'src/recomp_rt/win/season_screen.c'
       - 'tests/seasons/brazil_2026_league_test.c'
       - 'CMakeLists.txt'
@@ -38,6 +40,8 @@ on:
       - 'tests/seasons/brazil_2026_schedule_test.c'
       - 'tests/seasons/brazil_2026_calendar_test.c'
       - 'src/recomp_rt/win/season_sizes.c'
+      - 'src/recomp_rt/win/season_sizes.h'
+      - 'src/recomp_rt/win/season_uefa_league.c'
       - 'src/recomp_rt/win/season_screen.c'
       - 'tests/seasons/brazil_2026_league_test.c'
       - 'CMakeLists.txt'
@@ -98,6 +102,10 @@ jobs:
           cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
             tests/seasons/brazil_2026_runtime_gate_test.c -o /tmp/brasileirao-runtime-gate
           /tmp/brasileirao-runtime-gate
+      - name: Check post-fixtures title-stage integration compiles
+        run: |
+          cc -std=c11 -fsyntax-only -Isrc/recomp_rt -Isrc/recomp_rt/win \
+            src/recomp_rt/win/season_uefa_league.c
       - name: Note test limits
         run: |
           echo 'Pass confirms standalone source-level rules only.'
