@@ -11,8 +11,10 @@
  * original save/load mechanism handles Cup_Stage; this branch has NOT been
  * smoke-tested with saves. The English match-result handler promotes the
  * stage's winners (code 1) via status 0 and marks eliminated clubs as
- * status 0xfe, but the CBF "better placed advances on level aggregate"
- * criterion has NOT been wired into the game's two-leg tie resolver.
+ * status 0xfe. The original Cup::resolve_tie honors flag 0x1000 to make
+ * the second team advance on a level two-leg aggregate. We enable this
+ * ONLY for the two 2026 Brazilian promotion ties, where the better-ranked
+ * side is the second of each seeded pair. Not yet tested in a live game.
  * DO NOT enable this flag for important saves or release this feature.
  *
  * Historical Brazilian games and other competitions run original code.
@@ -26,6 +28,7 @@
 #include "brazil_2026_fixture_audit.h"
 #include "brazil_2026_calendar.h"
 #include "brazil_2026_promotion.h"
+#include "brazil_2026_promotion_round.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -146,7 +149,8 @@ static int own_stage(uint32_t league)
            rd32(g_mem, stage + 4) == rd32(g_mem, league + COMP_RECORD);
 }
 
-static int set_first_and_second_leg(uint32_t round_table, int edition)
+static int set_first_and_second_leg(uint32_t round_table, int edition,
+                                    const int ordered_ranks[4])
 {
     int now_year = (int16_t)rd16(g_mem, GAME_DATE + 2);
     int now_day = (int16_t)rd16(g_mem, GAME_DATE);
@@ -154,6 +158,18 @@ static int set_first_and_second_leg(uint32_t round_table, int edition)
     const int draw = brazil_cal_day(edition, 11, 19);
     if (now_year != edition || now_day + 1 > draw ||
         leg1 <= 0 || !readable(round_table)) return 0;
+
+    /* The original 2002 binary's tie resolver honors bit 0x1000 before
+     * away goals and penalties, advancing the SECOND side on a tied
+     * aggregate. We seed the 3rd and 4th placed clubs second in their
+     * respective pairs. Reject unexpected English round formats to avoid
+     * silently applying the wrong tiebreak to a modified executable. */
+    uint16_t cbf_flags = 0;
+    if (!brazil_2026_access_cbf_flags(
+            rd16(g_mem, round_table + 0x0du),
+            (int)g_mem[round_table + 0x21u],
+            ordered_ranks, &cbf_flags))
+        return 0;
 
     /* draw: Nov 19; two-legged match: Nov 21, Nov 28.
      * English semi-final round has fixed pairs (0x200), two legs at +0x21
@@ -166,6 +182,7 @@ static int set_first_and_second_leg(uint32_t round_table, int edition)
     if (rt_unwinding) return 0;
     g_mem[round_table + 0x21] = 2;
     g_mem[round_table + 0x22] = 7;
+    wr16(g_mem, round_table + 0x0du, cbf_flags);
     return 1;
 }
 
@@ -214,7 +231,7 @@ static int build_access_stage(uint32_t league)
         game_free(rounds_table);
         return 0;
     }
-    if (!set_first_and_second_leg(rounds_table, s.edition)) {
+    if (!set_first_and_second_leg(rounds_table, s.edition, order)) {
         game_free(rounds_table);
         return 0;
     }
@@ -246,7 +263,7 @@ static int build_access_stage(uint32_t league)
     wr32(g_mem, league + COMP_STAGE_NOW, 0);
     fprintf(stderr, "recomp: Serie B 2026: ONE-round promotion stage drawn; "
                     "two two-legged ties 21/28 Nov, NO FINAL "
-                    "(experimental; aggregate tie-break not validated)\n");
+                    "(experimental; higher-placed club advances on level aggregate)\n");
     return 1;
 }
 
@@ -263,9 +280,10 @@ RT_WRAP(0042cdd0, brazil_serie_b_access_advance)
  * League table status logic: code 1 means promoted (status 0), code 2
  * eliminated (status 0xfe). With only one stage round, a correctly
  * selected winner of EACH tie should be promoted rather than sending
- * just one finalist up. However the 2026 CBF *level aggregate better
- * ranked club* requirement is NOT guaranteed by this stage's tie engine,
- * so this must remain a diagnostic opt-in until that is implemented.
+ * just one finalist up. The single round uses the game's 0x1000
+ * "second side wins level aggregate" flag (Cup::resolve_tie 0x51f675),
+ * with the higher-ranked entrant seeded second in each fixed pair.
+ * This remains a diagnostic opt-in until end-to-end gameplay proves it.
  *
  * The identity check of the loaded original Cup_Stage makes the result
  * routing resilient to save/load without separate C global state.
