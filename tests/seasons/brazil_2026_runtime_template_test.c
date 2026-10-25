@@ -28,7 +28,7 @@ static const uint32_t NAME = 0x21010u;
 static const uint32_t KIND = 0x21020u;
 static uint32_t next_alloc = 0x30000u;
 static const char *test_file;
-static int season_on;
+static int season_on, test_edition;
 static int fallback_a, fallback_b;
 static int allocations, frees, dates_seen, slots_seen;
 static int recorded_day[38], recorded_month[38], recorded_year[38];
@@ -61,7 +61,7 @@ uint32_t rt_callback(uint32_t target, int nargs, const uint32_t *args)
         assert(table == next_alloc && round >= 0 && round < 38);
         assert(!visited_dates[round]);
         visited_dates[round] = 1;
-        assert(args[4] == 0 && args[6] == 2 && args[7] == 2026 && args[8] == 0);
+        assert(args[4] == 0 && args[6] == 2 && args[7] == (uint32_t)test_edition && args[8] == 0);
         int day = (int)args[2], month = (int)args[3];
         assert(day >= 1 && day <= 31 && month >= 0 && month < 12);
         recorded_day[round] = day;
@@ -126,14 +126,15 @@ static void clear_state(const char *file, int edition, int clubs, int meetings, 
     wr32(g_mem, KIND, 0x3456789au);
     test_file = file;
     season_on = 1;
+    test_edition = edition;
     fallback_a = fallback_b = allocations = frees = dates_seen = slots_seen = 0;
     memset(visited_dates, 0, sizeof visited_dates);
     memset(visited_slots, 0, sizeof visited_slots);
 }
 
-static void test_modern(int serie_b)
+static void test_modern(int serie_b, int edition)
 {
-    clear_state(serie_b ? "bra_nat_second" : "bra_nat_first", 2026, 20, 1, -1);
+    clear_state(serie_b ? "bra_nat_second" : "bra_nat_first", edition, 20, 1, -1);
     if (serie_b) f_0042c140(); else f_00429b50();
     assert(fallback_a == 0 && fallback_b == 0);
     assert(allocations == 1 && frees == 0);
@@ -145,12 +146,12 @@ static void test_modern(int serie_b)
     assert(rd16(g_mem, OBJ + COMP_MATCHES) == 0xffffu);
     int anchors[38];
     assert(brazil_2026_candidate_round_dates(
-        2026, serie_b ? BRA_CAL_SERIE_B : BRA_CAL_SERIE_A, anchors) == 38);
+        edition, serie_b ? BRA_CAL_SERIE_B : BRA_CAL_SERIE_A, anchors) == 38);
     for (int i = 0; i < 38; ++i) {
         assert(visited_dates[i] && visited_slots[i]);
-        assert(recorded_year[i] == 2026);
-        assert(brazil_cal_day(2026, recorded_month[i] + 1, recorded_day[i]) == anchors[i]);
-        assert(rd32(g_mem, next_alloc + (uint32_t)i * 0x41u + 0x3du) == 2026u);
+        assert(recorded_year[i] == edition);
+        assert(brazil_cal_day(edition, recorded_month[i] + 1, recorded_day[i]) == anchors[i]);
+        assert(rd32(g_mem, next_alloc + (uint32_t)i * 0x41u + 0x3du) == (uint32_t)edition);
     }
 }
 
@@ -184,8 +185,10 @@ int main(void)
     g_mem = (uint8_t *)calloc(1, 0x80000u);
     assert(g_mem);
     assert(setenv("RECOMP_BRAZIL_2026_RUNTIME_EXPERIMENT", "1", 1) == 0);
-    test_modern(0);
-    test_modern(1);
+    test_modern(0, 2026);
+    test_modern(1, 2026);
+    test_modern(0, 2027);
+    test_modern(1, 2027);
     test_historical_fallback();
     unsetenv("RECOMP_BRAZIL_2026_RUNTIME_EXPERIMENT");
     clear_state("bra_nat_first", 2026, 20, 1, -1);
