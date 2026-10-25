@@ -1,4 +1,4 @@
-/* Guard for an experimental 38-date Brazilian national league scheduler.
+/* Guard for an experimental 38-date Brazilian national league scheduler (2026/27).
  *
  * This predicate does not read or modify game memory. Callers must also
  * require an explicit experimental option and season_game_changes().
@@ -15,7 +15,7 @@ static inline int brazil_2026_runtime_schedule_allowed(const char *file,
 {
     return file &&
            (!strcmp(file, "bra_nat_first") || !strcmp(file, "bra_nat_second")) &&
-           edition == 2026 && clubs == 20 &&
+           (edition == 2026 || edition == 2027) && clubs == 20 &&
            (meetings == 1 || meetings == 2) && stage == -1;
 }
 
