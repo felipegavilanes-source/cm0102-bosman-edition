@@ -55,7 +55,8 @@ static int audit_on(void)
 {
     return season_game_changes() &&
         (flag("RECOMP_BRAZIL_2026_FIXTURE_AUDIT") ||
-         flag("RECOMP_BRAZIL_2026_STAGE_EXPERIMENT"));
+         flag("RECOMP_BRAZIL_2026_STAGE_EXPERIMENT") ||
+         flag("RECOMP_BRAZIL_2026_ACCESS_EXPERIMENT"));
 }
 
 void brazil_fixture_audit_begin(uint32_t league)
@@ -114,7 +115,8 @@ void brazil_fixture_audit_end(uint32_t league)
     last_seen = current.tracker.count;
     last_ok = brazil_fixture_tracker_complete(&current.tracker);
     if (flag("RECOMP_BRAZIL_2026_FIXTURE_AUDIT") ||
-        flag("RECOMP_BRAZIL_2026_STAGE_EXPERIMENT")) {
+        flag("RECOMP_BRAZIL_2026_STAGE_EXPERIMENT") ||
+         flag("RECOMP_BRAZIL_2026_ACCESS_EXPERIMENT")) {
         const char *file = season_change_file(league);
         fprintf(stderr,
                 "recomp: Brazil fixture audit %s year=%d inserted=%d/380 "
