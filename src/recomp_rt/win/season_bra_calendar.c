@@ -71,25 +71,6 @@ static void game_free(uint32_t pointer)
     call_cdecl(F_FREE, 1, args);
 }
 
-/* Convert ordinal day (1-based) into the month index (0..11) and calendar
- * day expected by League::round_set_date. No host localtime or TZ calls. */
-static int day_and_month(int year, int ordinal, int *day, int *month)
-{
-    if (!day || !month || ordinal < 1 ||
-        ordinal > brazil_cal_days_in_year(year)) return 0;
-    for (int m = 1; m <= 12; ++m) {
-        int begin = brazil_cal_day(year, m, 1);
-        int end = m == 12 ? brazil_cal_days_in_year(year) + 1
-                          : brazil_cal_day(year, m + 1, 1);
-        if (ordinal >= begin && ordinal < end) {
-            *day = ordinal - begin + 1;
-            *month = m - 1;
-            return 1;
-        }
-    }
-    return 0;
-}
-
 /* Build the 38 x 0x41 in-game round records using the same two original
  * engine routines as the 2002 Brazilian and English Premier schedulers.
  * Fail without publishing the pointer or changing league-object fields.
@@ -108,7 +89,7 @@ static uint32_t template_38(int edition, int kind)
 
     for (int round = 0; round < NEW_ROUNDS && !rt_unwinding; ++round) {
         int day = 0, month = 0;
-        if (!day_and_month(edition, anchors[round], &day, &month)) {
+        if (!brazil_cal_split_day(edition, anchors[round], &day, &month)) {
             game_free(table);
             return 0;
         }
