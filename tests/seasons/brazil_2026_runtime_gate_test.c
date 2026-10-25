@@ -9,7 +9,9 @@ int main(void)
     assert(brazil_2026_runtime_schedule_allowed("bra_nat_first", 2026, 20, 2, -1));
     assert(!brazil_2026_runtime_schedule_allowed("bra_nat_first", 2002, 20, 1, -1));
     assert(!brazil_2026_runtime_schedule_allowed("bra_nat_first", 2025, 20, 1, -1));
-    assert(!brazil_2026_runtime_schedule_allowed("bra_nat_first", 2027, 20, 1, -1));
+    assert(brazil_2026_runtime_schedule_allowed("bra_nat_first", 2027, 20, 1, -1));
+    assert(brazil_2026_runtime_schedule_allowed("bra_nat_second", 2027, 20, 1, -1));
+    assert(!brazil_2026_runtime_schedule_allowed("bra_nat_first", 2028, 20, 1, -1));
     assert(!brazil_2026_runtime_schedule_allowed("bra_nat_first", 2026, 28, 1, -1));
     assert(!brazil_2026_runtime_schedule_allowed("bra_nat_first", 2026, 20, 3, -1));
     assert(!brazil_2026_runtime_schedule_allowed("bra_nat_first", 2026, 20, 1, 0));
