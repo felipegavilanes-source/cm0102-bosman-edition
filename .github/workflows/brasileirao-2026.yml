@@ -18,6 +18,8 @@ on:
       - 'src/recomp_rt/win/brazil_2026_access.c'
       - 'src/recomp_rt/win/brazil_2026_access.h'
       - 'src/recomp_rt/win/brazil_2026_access_gate.h'
+      - 'src/recomp_rt/win/brazil_2026_promotion_round.h'
+      - 'tests/seasons/brazil_2026_promotion_round_test.c'
       - 'tests/seasons/brazil_2026_access_gate_test.c'
       - 'tests/seasons/brazil_2026_access_stage_test.c'
       - 'tests/seasons/brazil_2026_fixture_tracker_test.c'
@@ -53,6 +55,8 @@ on:
       - 'src/recomp_rt/win/brazil_2026_access.c'
       - 'src/recomp_rt/win/brazil_2026_access.h'
       - 'src/recomp_rt/win/brazil_2026_access_gate.h'
+      - 'src/recomp_rt/win/brazil_2026_promotion_round.h'
+      - 'tests/seasons/brazil_2026_promotion_round_test.c'
       - 'tests/seasons/brazil_2026_access_gate_test.c'
       - 'tests/seasons/brazil_2026_access_stage_test.c'
       - 'tests/seasons/brazil_2026_fixture_tracker_test.c'
@@ -160,6 +164,11 @@ jobs:
           /tmp/brasileirao-access-stage
           cc -std=c11 -fsyntax-only -Isrc/recomp_rt -Isrc/recomp_rt/win \
             src/recomp_rt/win/brazil_2026_access.c
+      - name: Verify better ranked Brazilian team wins 2-leg tied aggregate
+        run: |
+          cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
+            tests/seasons/brazil_2026_promotion_round_test.c -o /tmp/brazil-cbf-tiebreak
+          /tmp/brazil-cbf-tiebreak
       - name: Note test limits
         run: |
           echo 'Pass confirms standalone source-level rules only.'
