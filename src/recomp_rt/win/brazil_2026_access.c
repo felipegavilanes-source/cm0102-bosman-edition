@@ -225,10 +225,11 @@ static int build_access_stage(uint32_t league)
         wr32(g_mem, list + (uint32_t)i * 4u, clubs[i]);
     uint32_t bytes[1] = {0xb2};
     uint32_t stage = call_cdecl(F_NEW, 1, bytes);
-    if (!readable(stage) || rt_unwinding) {
+    if (rt_unwinding) return 1; /* never resume an unwinding game frame */
+    if (!readable(stage)) {
         game_free(list);
         game_free(rounds_table);
-        return 1; /* unrolled call cannot be safely resumed in unwind */
+        return 0; /* original stage remains available as fallback */
     }
     uint32_t args[15] = {
         league, 4, list, 1, rd32(g_mem, league + COMP_RECORD),
