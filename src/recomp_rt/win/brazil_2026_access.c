@@ -29,6 +29,7 @@
 #include "brazil_2026_calendar.h"
 #include "brazil_2026_promotion.h"
 #include "brazil_2026_promotion_round.h"
+#include "brazil_2026_access_promotions.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -265,6 +266,37 @@ static int build_access_stage(uint32_t league)
                     "two two-legged ties 21/28 Nov, NO FINAL "
                     "(experimental; higher-placed club advances on level aggregate)\n");
     return 1;
+}
+
+/* Read-only validation at League::promote_and_relegate (0x689c80).
+ * It is called immediately before the original moves status=0/5 up and
+ * status=3 down. This detects a failed 2-winner promotion outcome in real
+ * gameplay without changing the original chain or manipulating saves.
+ * The 'ready' proof is solely the saved original one-round Cup_Stage.
+ */
+void brazil_2026_access_audit_promotion(uint32_t lower)
+{
+    if (!enabled() || !readable(lower)) return;
+    const char *file = season_change_file(lower);
+    if (!file || strcmp(file, "bra_nat_second")) return;
+    BrazilAccessState s = snapshot(lower);
+    if (!brazil_2026_access_result_gate(file, &s, 0) ||
+        !own_stage(lower)) return;
+    uint32_t table = rd32(g_mem, lower + COMP_TABLE);
+    if (!readable(table)) return;
+    uint8_t status[20];
+    int up = 0, down = 0;
+    for (int i = 0; i < 20; ++i) {
+        status[i] = g_mem[table + (uint32_t)i * ROW_SIZE + 0x37u];
+        if (status[i] == 0 || status[i] == 5) ++up;
+        if (status[i] == 3) ++down;
+    }
+    const int valid = brazil_2026_access_promotions_valid(status, 20);
+    fprintf(stderr, "recomp: Serie B 2026 pre-promotion check: "
+            "%d teams marked up (expected 4), %d marked down "
+            "(expected 4), two separate tie winners: %s "
+            "(read-only; original promotion chain unchanged)\n",
+            up, down, valid ? "YES" : "NO");
 }
 
 /* Original BraNatSecond::advance_stage (thiscall, no arguments).
