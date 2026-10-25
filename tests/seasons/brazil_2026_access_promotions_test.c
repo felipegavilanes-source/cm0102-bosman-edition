@@ -24,6 +24,15 @@ int main(void)
     assert(!brazil_2026_access_promotions_valid(s, 19));
     assert(!brazil_2026_access_promotions_valid(0, 20));
 
+    /* Both opponents of the SAME tie must never be promoted together,
+     * even if there are exactly four up overall. */
+    table(s);
+    s[2] = 0; s[5] = 0; /* 3rd AND 6th: impossible */
+    assert(!brazil_2026_access_promotions_valid(s, 20));
+    table(s);
+    s[3] = 0; s[4] = 0; /* 4th AND 5th: impossible */
+    assert(!brazil_2026_access_promotions_valid(s, 20));
+
     table(s);
     s[5] = 0; /* sixth upsets third: still legal on better aggregate */
     s[4] = 0; /* fifth upsets fourth */
