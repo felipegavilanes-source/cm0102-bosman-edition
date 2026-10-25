@@ -4,9 +4,9 @@
  * 20 * 19 = 380 directed fixtures, 38 fixtures per club (19 home/19 away).
  * This is a pure, fixed-size data structure; no game memory is touched.
  *
- * Runtime adapter logs ADD_FIXTURE callback *attempts*, not verified
- * insertions in the game's fixture manager. Do not infer a successful
- * save/load or collision-free 2026 season from this ledger alone.
+ * Runtime adapter records ADD_FIXTURE callbacks after the original reports
+ * success. Do not infer safe save/load, a completed league season or
+ * collision-free cup scheduling from this ledger alone.
  */
 #ifndef RECOMP_BRAZIL_2026_FIXTURE_TRACKER_H
 #define RECOMP_BRAZIL_2026_FIXTURE_TRACKER_H
@@ -36,7 +36,7 @@ static inline int brazil_fixture_tracker_begin(BrazilFixtureTracker *t,
     return 1;
 }
 
-/* Add one observed call to the original fixture manager. Fail closed on
+/* Record one successfully inserted fixture from the original manager. Fail closed on
  * unknown clubs, duplicate fixtures, or a self-match. A failed add poisons
  * the ledger so a false "complete" result is impossible.
  */
