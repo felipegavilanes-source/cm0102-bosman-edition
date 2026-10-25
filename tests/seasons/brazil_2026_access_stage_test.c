@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "rt.h"
+#include "../../src/recomp_rt/win/brazil_2026_promotion_round.h"
 
 Cpu cpu;
 Fpu fpu;
