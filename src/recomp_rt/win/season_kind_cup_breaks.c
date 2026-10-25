@@ -334,8 +334,9 @@ static void log_fixture_years(const char *when)
 void o_005aa680(void);
 RT_WRAP(005aa680, cup_breaks_add_fixture)
 {
-    brazil_fixture_audit_observe(rt_arg(0)); /* no write: original add still runs */
-    season_records_fixture_log(rt_arg(0), rd32(g_mem, cpu.esp));     /* test log of slice 15b's fix */
+    /* Save the argument before the original stdcall consumes the stack. */
+    uint32_t observed_fixture = rt_arg(0);
+    season_records_fixture_log(observed_fixture, rd32(g_mem, cpu.esp));     /* test log of slice 15b's fix */
     if (logging() && season_code_on()) {
         uint32_t f = rt_arg(0);
         int year = f >= 0x10000u && f < 0xfff00000u ? (int16_t)rd16(g_mem, f + 0x28) : 0;
@@ -345,6 +346,11 @@ RT_WRAP(005aa680, cup_breaks_add_fixture)
                     never_obj ? " in a constructor that waits for ever" : "");
     }
     o_005aa680();
+    /* Original FIXTURE_MANAGER::add_fixture returns EAX=1 for accepted
+     * insertion (0x5aab9b), EAX=0 for rejection (e.g. 0x5aa964).
+     * Count only accepted fixtures, not attempted or rejected pairs. */
+    if (!rt_unwinding && (cpu.eax & 0xffu))
+        brazil_fixture_audit_observe(observed_fixture);
 }
 
 static void breaks_new_game(int start_year)
