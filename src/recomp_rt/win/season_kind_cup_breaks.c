@@ -42,6 +42,7 @@
  * slice 21). */
 #include "win.h"
 #include "season_records.h"
+#include "brazil_2026_fixture_audit.h"
 #include "season.h"
 #include "season_change.h"
 #include "season_cups.h"
@@ -333,6 +334,7 @@ static void log_fixture_years(const char *when)
 void o_005aa680(void);
 RT_WRAP(005aa680, cup_breaks_add_fixture)
 {
+    brazil_fixture_audit_observe(rt_arg(0)); /* no write: original add still runs */
     season_records_fixture_log(rt_arg(0), rd32(g_mem, cpu.esp));     /* test log of slice 15b's fix */
     if (logging() && season_code_on()) {
         uint32_t f = rt_arg(0);
