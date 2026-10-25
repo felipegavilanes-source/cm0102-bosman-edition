@@ -10,6 +10,7 @@
 #include "season_divisions_ita.h"
 #include "brazil_2026_league.h"
 #include "brazil_2026_stage_gate.h"
+#include "brazil_2026_fixture_audit.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -378,7 +379,11 @@ static void brazil_2026_remove_title_stage_if_ready(uint32_t obj)
  */
 void season_sizes_brazil_after_fixtures(uint32_t obj)
 {
-    if (!rt_unwinding) brazil_2026_remove_title_stage_if_ready(obj);
+    /* Require exactly one home and away match against every opponent,
+     * observed inside this same League::create_fixtures call. If the
+     * callback record is missing or incomplete, preserve the old stage. */
+    if (!rt_unwinding && brazil_fixture_audit_ready(obj))
+        brazil_2026_remove_title_stage_if_ready(obj);
 }
 
 /* Read-only runtime probe for the Brazilian legacy fixture/stage builders.
@@ -417,7 +422,8 @@ void season_sizes_rules(uint32_t obj)
     sizes_rules(obj);
     if (!rt_unwinding) season_playoffs_rules(obj);   /* slice 19: a play-off in a league with none */
     if (!rt_unwinding) season_divisions_rules(obj);  /* slice 20: the places towards a new division */
-    if (!rt_unwinding) brazil_2026_remove_title_stage_if_ready(obj); /* guarded, off-by-default */
+    /* Never remove the stage before the full fixture generator has been
+     * observed: 38 dates alone do not prove 380 fixtures exist. */
     if (!rt_unwinding) brazil_2026_audit(obj);       /* experimental read-only Brazil calendar trace */
 }
 
