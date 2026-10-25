@@ -8,6 +8,9 @@ on:
       - 'src/recomp_rt/win/brazil_2026_promotion.h'
       - 'src/recomp_rt/win/brazil_2026_league.h'
       - 'src/recomp_rt/win/brazil_2026_stage_gate.h'
+      - 'src/recomp_rt/win/brazil_2026_runtime_gate.h'
+      - 'src/recomp_rt/win/season_bra_calendar.c'
+      - 'tests/seasons/brazil_2026_runtime_gate_test.c'
       - 'tests/seasons/brazil_2026_stage_gate_test.c'
       - 'src/recomp_rt/win/brazil_2026_calendar.h'
       - 'src/recomp_rt/win/brazil_2026_schedule.h'
@@ -26,6 +29,9 @@ on:
       - 'src/recomp_rt/win/brazil_2026_promotion.h'
       - 'src/recomp_rt/win/brazil_2026_league.h'
       - 'src/recomp_rt/win/brazil_2026_stage_gate.h'
+      - 'src/recomp_rt/win/brazil_2026_runtime_gate.h'
+      - 'src/recomp_rt/win/season_bra_calendar.c'
+      - 'tests/seasons/brazil_2026_runtime_gate_test.c'
       - 'tests/seasons/brazil_2026_stage_gate_test.c'
       - 'src/recomp_rt/win/brazil_2026_calendar.h'
       - 'src/recomp_rt/win/brazil_2026_schedule.h'
@@ -85,6 +91,13 @@ jobs:
           # Compile checking is reserved for the full game build.
           ! grep -q 'Starts July %d' src/recomp_rt/win/season_screen.c
           grep -q 'Start date follows chosen leagues' src/recomp_rt/win/season_screen.c
+      - name: Verify experimental live 38-date generator syntax and guards
+        run: |
+          cc -std=c11 -fsyntax-only -Isrc/recomp_rt -Isrc/recomp_rt/win \
+            src/recomp_rt/win/season_bra_calendar.c
+          cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
+            tests/seasons/brazil_2026_runtime_gate_test.c -o /tmp/brasileirao-runtime-gate
+          /tmp/brasileirao-runtime-gate
       - name: Note test limits
         run: |
           echo 'Pass confirms standalone source-level rules only.'
