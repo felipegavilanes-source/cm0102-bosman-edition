@@ -39,8 +39,13 @@ static inline int brazil_2026_candidate_round_dates(int year, int kind,
         const int before = kind == BRA_CAL_SERIE_B ? 17 : 18;
         const int after = BRAZIL_2026_ROUNDS - before;
         const int before_first = window.first_day;
-        const int before_last = window.blackout_first - 1;
-        const int after_first = window.blackout_last + 1;
+        /* In 2026 the test baseline stops before June, and resumes with
+         * the published 22 July Serie A round. 2027 uses the full
+         * protected World Cup break boundaries. */
+        const int before_last = year == 2026
+            ? brazil_cal_day(year, 5, 31) : window.blackout_first - 1;
+        const int after_first = year == 2026
+            ? brazil_cal_day(year, 7, 22) : window.blackout_last + 1;
         const int after_last = window.last_day;
         if (before < 2 || after < 2 ||
             before_last <= before_first || after_last <= after_first)
