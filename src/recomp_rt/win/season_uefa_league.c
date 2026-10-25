@@ -26,6 +26,7 @@
 #include "season_uefa_league.h"
 #include "season_cups.h"
 #include "season_divisions_ita.h"
+#include "season_sizes.h"  /* safe post-fixture Serie A title-stage gate */
 
 #include <stdio.h>
 #include <string.h>
@@ -144,6 +145,8 @@ RT_WRAP(006835c0, league_create_fixtures)
         pending_stage = pending_list = 0;
     }
     o_006835c0();
+    if (!rt_unwinding)
+        season_sizes_brazil_after_fixtures(league);
 }
 
 /* The fixed list of the draw (new[] of the game: the count, then the entries), or 0. */
