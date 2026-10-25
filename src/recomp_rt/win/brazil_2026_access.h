@@ -5,4 +5,7 @@
 #define RECOMP_BRAZIL_2026_ACCESS_H
 #include <stdint.h>
 void brazil_2026_access_after_fixtures(uint32_t league);
+/* Read-only: inspect exactly four promoted and four relegated rows before
+ * the original inter-division promotion chain. Does not block game code. */
+void brazil_2026_access_audit_promotion(uint32_t lower);
 #endif
