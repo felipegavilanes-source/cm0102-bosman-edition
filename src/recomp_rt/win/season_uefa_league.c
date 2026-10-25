@@ -28,6 +28,7 @@
 #include "season_divisions_ita.h"
 #include "season_sizes.h"  /* safe post-fixture Serie A title-stage gate */
 #include "brazil_2026_fixture_audit.h"
+#include "brazil_2026_access.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -148,8 +149,9 @@ RT_WRAP(006835c0, league_create_fixtures)
     }
     o_006835c0();
     if (!rt_unwinding) {
-        brazil_fixture_audit_end(league); /* validate before title-stage change */
-        season_sizes_brazil_after_fixtures(league);
+        brazil_fixture_audit_end(league); /* count only accepted inserts */
+        brazil_2026_access_after_fixtures(league); /* opt-in Serie B */
+        season_sizes_brazil_after_fixtures(league); /* opt-in Serie A */
     }
 }
 
