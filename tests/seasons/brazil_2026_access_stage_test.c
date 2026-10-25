@@ -49,9 +49,9 @@ void rt_jump(uint32_t target)
     for (int i = 0; i < 20; ++i)
         if (clubs[i] == played) {
             if (code == 1)
-                g_mem[ROWS + ROW_SIZE * (uint32_t)i + 0x37u] = 0;
+                g_mem[ROWS + 0x3bu * (uint32_t)i + 0x37u] = 0;
             else if (code == 2)
-                g_mem[ROWS + ROW_SIZE * (uint32_t)i + 0x37u] = 0xfe;
+                g_mem[ROWS + 0x3bu * (uint32_t)i + 0x37u] = 0xfe;
             return;
         }
     assert(!"Unknown club in English result handler mock");
