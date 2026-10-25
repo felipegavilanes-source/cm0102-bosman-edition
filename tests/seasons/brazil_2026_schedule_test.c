@@ -21,7 +21,21 @@ static void test_anchor_dates(void)
     assert(b[0] == DAY(3, 20));
     assert(b[37] == DAY(11, 14));
     assert(brazil_cal_allowed(2026, BRA_CAL_SERIE_B, DAY(6, 20)));
-    assert(!brazil_2026_candidate_round_dates(2027, BRA_CAL_SERIE_B, b));
+    assert(brazil_2026_candidate_round_dates(2027, BRA_CAL_SERIE_B, b) == 38);
+    assert(b[0] == brazil_cal_day(2027, 3, 20));
+    assert(b[16] == brazil_cal_day(2027, 6, 23));
+    assert(b[17] == brazil_cal_day(2027, 7, 26));
+    assert(b[37] == brazil_cal_day(2027, 11, 27));
+    for (int i = 0; i < 38; ++i)
+        assert(brazil_cal_allowed(2027, BRA_CAL_SERIE_B, b[i]));
+    assert(brazil_2026_candidate_round_dates(2027, BRA_CAL_SERIE_A, a) == 38);
+    assert(a[0] == brazil_cal_day(2027, 1, 27));
+    assert(a[17] == brazil_cal_day(2027, 6, 23));
+    assert(a[18] == brazil_cal_day(2027, 7, 26));
+    assert(a[37] == brazil_cal_day(2027, 12, 1));
+    for (int i = 0; i < 38; ++i)
+        assert(brazil_cal_allowed(2027, BRA_CAL_SERIE_A, a[i]));
+    assert(!brazil_2026_candidate_round_dates(2028, BRA_CAL_SERIE_B, b));
     assert(!brazil_2026_candidate_round_dates(2026, BRA_CAL_STATE, b));
     assert(!brazil_2026_candidate_round_dates(2026, BRA_CAL_SERIE_A, NULL));
 }
@@ -67,6 +81,36 @@ static void test_schedule(int kind)
     }
 }
 
+static void test_rollover_2027(int kind)
+{
+    Brazil2026Fixture fixtures[380];
+    BrazilCalendarEvent proposed[380], combined[382];
+    int anchors[38];
+    assert(brazil_2026_round_robin(fixtures, 380) == 380);
+    assert(brazil_2026_candidate_round_dates(2027, kind, anchors) == 38);
+
+    /* These cups' detailed 2027 dates are not coded here: they are
+     * immutable existing game fixtures and must still block clashes. */
+    const BrazilCalendarEvent existing[] = {
+        {2027,  brazil_cal_day(2027, 5, 5), BRA_CAL_LIBERTADORES, 0, 100},
+        {2027,  brazil_cal_day(2027, 9, 8), BRA_CAL_SUDAMERICANA, 1, 101}
+    };
+    assert(brazil_cal_validate(existing, 2, 3, NULL));
+    assert(brazil_2026_plan_league(fixtures, 380, 2027, kind, anchors,
+                                   existing, 2, 3, 3, proposed, 380) == 380);
+    combined[0] = existing[0];
+    combined[1] = existing[1];
+    for (int i = 0; i < 380; ++i) {
+        assert(proposed[i].year == 2027);
+        assert(proposed[i].competition == kind);
+        assert(brazil_cal_allowed(2027, kind, proposed[i].day));
+        assert(proposed[i].home_club == fixtures[i].home);
+        assert(proposed[i].away_club == fixtures[i].away);
+        combined[i + 2] = proposed[i];
+    }
+    assert(brazil_cal_validate(combined, 382, 3, NULL));
+}
+
 static void test_fail_closed_without_output_changes(void)
 {
     Brazil2026Fixture fixtures[380];
@@ -105,6 +149,8 @@ int main(void)
     test_anchor_dates();
     test_schedule(BRA_CAL_SERIE_A);
     test_schedule(BRA_CAL_SERIE_B);
+    test_rollover_2027(BRA_CAL_SERIE_A);
+    test_rollover_2027(BRA_CAL_SERIE_B);
     test_fail_closed_without_output_changes();
     return 0;
 }
