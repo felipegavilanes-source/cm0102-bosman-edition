@@ -62,7 +62,13 @@ void brazil_fixture_audit_begin(uint32_t league)
 {
     /* Nested create_fixtures calls from other cups must not clear an active
      * national-league ledger. Their record pointers do not match anyway. */
-    if (current.active || !audit_on() || !readable(league)) return;
+    if (current.active) return;
+    /* An object address can be reused after loading a save or starting
+     * another game. Never trust a result from an earlier fixture pass. */
+    last_league = 0;
+    last_ok = 0;
+    last_seen = 0;
+    if (!audit_on() || !readable(league)) return;
     const char *file = season_change_file(league);
     if (!file ||
         (strcmp(file, "bra_nat_first") && strcmp(file, "bra_nat_second")))
@@ -122,5 +128,5 @@ void brazil_fixture_audit_end(uint32_t league)
 
 int brazil_fixture_audit_ready(uint32_t league)
 {
-    return league && last_league == league && last_ok;
+    return audit_on() && !current.active && league && last_league == league && last_ok;
 }
