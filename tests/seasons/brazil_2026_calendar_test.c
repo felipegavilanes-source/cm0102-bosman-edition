@@ -9,6 +9,26 @@
 
 #define DAY(Y,M,D) brazil_cal_day((Y), (M), (D))
 
+static void test_roundtrip_dates(void)
+{
+    for (int year = 2026; year <= 2028; ++year) {
+        for (int ordinal = 1; ordinal <= brazil_cal_days_in_year(year); ++ordinal) {
+            int day = -1, month = -1;
+            assert(brazil_cal_split_day(year, ordinal, &day, &month));
+            assert(month >= 0 && month < 12);
+            assert(day >= 1 && day <= 31);
+            assert(brazil_cal_day(year, month + 1, day) == ordinal);
+        }
+    }
+    int day = 9, month = 8;
+    assert(!brazil_cal_split_day(2026, 0, &day, &month));
+    assert(!brazil_cal_split_day(2026, 366, &day, &month));
+    assert(!brazil_cal_split_day(1900, 1, &day, &month));
+    assert(!brazil_cal_split_day(2026, 1, 0, &month));
+    assert(!brazil_cal_split_day(2026, 1, &day, 0));
+    assert(day == 9 && month == 8);
+}
+
 static void test_date_and_competition_windows(void)
 {
     BrazilCalendarWindow w;
@@ -172,6 +192,7 @@ static void test_overlap_and_reschedule(void)
 
 int main(void)
 {
+    test_roundtrip_dates();
     test_date_and_competition_windows();
     test_overlap_and_reschedule();
     return 0;
