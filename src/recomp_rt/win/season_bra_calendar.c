@@ -23,6 +23,7 @@
 #include "win.h"
 #include "season.h"
 #include "season_change.h"
+#include "season_names.h"   /* season_game_changes */
 #include "brazil_2026_calendar.h"
 #include "brazil_2026_schedule.h"
 #include "brazil_2026_runtime_gate.h"
