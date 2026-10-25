@@ -11,6 +11,7 @@
 #include "brazil_2026_league.h"
 #include "brazil_2026_stage_gate.h"
 #include "brazil_2026_fixture_audit.h"
+#include "brazil_2026_access.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -452,6 +453,11 @@ void o_00689c80(void);
  * with the moves at 0x689f47 and 0x689fbb (asserts league.cpp 5596 and 5602). */
 RT_WRAP(00689c80, promote_relegate)
 {
+    /* An optional, read-only check of saved Serie B 2026 Cup_Stage
+     * outcomes. This executes before the original promotion chain even
+     * if automatic league-size adjustments are disabled. */
+    if (!rt_unwinding)
+        brazil_2026_access_audit_promotion(rt_arg(1));
     if (!sizes_on()) {
         o_00689c80();
         return;
