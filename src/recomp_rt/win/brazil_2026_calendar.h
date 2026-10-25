@@ -68,6 +68,30 @@ static inline int brazil_cal_day(int year, int month, int day)
     return ordinal;
 }
 
+/* Inverse of brazil_cal_day for the original League::round_set_date
+ * call: month is zero-based (January 0), day is one-based. This is pure
+ * calendar conversion and does not depend on system locale or time zone.
+ * Invalid inputs leave both outputs untouched.
+ */
+static inline int brazil_cal_split_day(int year, int ordinal,
+                                       int *day, int *month_index)
+{
+    if (!day || !month_index || year < 2001 || year > 2099 ||
+        ordinal < 1 || ordinal > brazil_cal_days_in_year(year))
+        return 0;
+    for (int m = 1; m <= 12; ++m) {
+        int first = brazil_cal_day(year, m, 1);
+        int after = m == 12 ? brazil_cal_days_in_year(year) + 1
+                            : brazil_cal_day(year, m + 1, 1);
+        if (ordinal >= first && ordinal < after) {
+            *day = ordinal - first + 1;
+            *month_index = m - 1;
+            return 1;
+        }
+    }
+    return 0;
+}
+
 /* Gregorian continuous day count to compare fixtures across year rollover. */
 static inline int brazil_cal_serial(int year, int day)
 {
