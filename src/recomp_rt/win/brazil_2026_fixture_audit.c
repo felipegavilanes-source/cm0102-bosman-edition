@@ -5,9 +5,9 @@
  *   RECOMP_BRAZIL_2026_STAGE_EXPERIMENT=1 (extra promotion/title guard)
  *
  * It does not intercept match results, change fixtures, or write to game
- * memory. It checks the raw proposed home/away pairs immediately before
- * the original FIXTURE_MANAGER::add_fixture processes them; an accepted
- * call is NOT proof of a committed/persisted match. Use a real-game smoke
+ * memory. It checks home/away pairs only AFTER the original fixture manager
+ * returns success. A successful insertion is still not proof of safe
+ * save/load, or that no other competition may later move the match. Use a real-game smoke
  * test for that stronger claim.
  */
 #include "win.h"
@@ -117,9 +117,9 @@ void brazil_fixture_audit_end(uint32_t league)
         flag("RECOMP_BRAZIL_2026_STAGE_EXPERIMENT")) {
         const char *file = season_change_file(league);
         fprintf(stderr,
-                "recomp: Brazil fixture audit %s year=%d observed=%d/380 "
+                "recomp: Brazil fixture audit %s year=%d inserted=%d/380 "
                 "duplicates_or_invalid=%d exact_home_away=%s "
-                "(fixture manager add attempts, not persisted games)\n",
+                "(accepted fixture-manager insertions; save/load unverified)\n",
                 file ? file : "?", (int16_t)rd16(g_mem, league + COMP_YEAR),
                 last_seen, current.tracker.bad, last_ok ? "YES" : "NO");
     }
