@@ -1,0 +1,187 @@
+name: Brasileirao 2026 rules (standalone)
+
+on:
+  push:
+    branches:
+      - feature/brasileirao-2026
+    paths:
+      - 'src/recomp_rt/win/brazil_2026_promotion.h'
+      - 'src/recomp_rt/win/brazil_2026_league.h'
+      - 'src/recomp_rt/win/brazil_2026_stage_gate.h'
+      - 'src/recomp_rt/win/brazil_2026_runtime_gate.h'
+      - 'src/recomp_rt/win/season_bra_calendar.c'
+      - 'tests/seasons/brazil_2026_runtime_gate_test.c'
+      - 'tests/seasons/brazil_2026_runtime_template_test.c'
+      - 'src/recomp_rt/win/brazil_2026_fixture_tracker.h'
+      - 'src/recomp_rt/win/brazil_2026_fixture_audit.h'
+      - 'src/recomp_rt/win/brazil_2026_fixture_audit.c'
+      - 'src/recomp_rt/win/brazil_2026_access.c'
+      - 'src/recomp_rt/win/brazil_2026_access.h'
+      - 'src/recomp_rt/win/brazil_2026_access_gate.h'
+      - 'src/recomp_rt/win/brazil_2026_promotion_round.h'
+      - 'src/recomp_rt/win/brazil_2026_access_promotions.h'
+      - 'tests/seasons/brazil_2026_access_promotions_test.c'
+      - 'tools/recomp/brazil_2026_cup_tiebreak_audit.py'
+      - 'tests/seasons/brazil_2026_promotion_round_test.c'
+      - 'tests/seasons/brazil_2026_access_gate_test.c'
+      - 'tests/seasons/brazil_2026_access_stage_test.c'
+      - 'tests/seasons/brazil_2026_fixture_tracker_test.c'
+      - 'tests/seasons/brazil_2026_fixture_audit_test.c'
+      - 'src/recomp_rt/win/season_kind_cup_breaks.c'
+      - 'tests/seasons/brazil_2026_stage_gate_test.c'
+      - 'src/recomp_rt/win/brazil_2026_calendar.h'
+      - 'src/recomp_rt/win/brazil_2026_schedule.h'
+      - 'tests/seasons/brazil_2026_schedule_test.c'
+      - 'tests/seasons/brazil_2026_calendar_test.c'
+      - 'src/recomp_rt/win/season_sizes.c'
+      - 'src/recomp_rt/win/season_sizes.h'
+      - 'src/recomp_rt/win/season_uefa_league.c'
+      - 'src/recomp_rt/win/season_screen.c'
+      - 'tests/seasons/brazil_2026_league_test.c'
+      - 'CMakeLists.txt'
+      - 'tests/seasons/brazil_2026_promotion_test.c'
+      - 'tests/seasons/test_brazil_2026_rules.py'
+      - 'docs/research/rules-0.6.0/bra.tsv'
+      - '.github/workflows/brasileirao-2026.yml'
+  pull_request:
+    paths:
+      - 'src/recomp_rt/win/brazil_2026_promotion.h'
+      - 'src/recomp_rt/win/brazil_2026_league.h'
+      - 'src/recomp_rt/win/brazil_2026_stage_gate.h'
+      - 'src/recomp_rt/win/brazil_2026_runtime_gate.h'
+      - 'src/recomp_rt/win/season_bra_calendar.c'
+      - 'tests/seasons/brazil_2026_runtime_gate_test.c'
+      - 'tests/seasons/brazil_2026_runtime_template_test.c'
+      - 'src/recomp_rt/win/brazil_2026_fixture_tracker.h'
+      - 'src/recomp_rt/win/brazil_2026_fixture_audit.h'
+      - 'src/recomp_rt/win/brazil_2026_fixture_audit.c'
+      - 'src/recomp_rt/win/brazil_2026_access.c'
+      - 'src/recomp_rt/win/brazil_2026_access.h'
+      - 'src/recomp_rt/win/brazil_2026_access_gate.h'
+      - 'src/recomp_rt/win/brazil_2026_promotion_round.h'
+      - 'src/recomp_rt/win/brazil_2026_access_promotions.h'
+      - 'tests/seasons/brazil_2026_access_promotions_test.c'
+      - 'tools/recomp/brazil_2026_cup_tiebreak_audit.py'
+      - 'tests/seasons/brazil_2026_promotion_round_test.c'
+      - 'tests/seasons/brazil_2026_access_gate_test.c'
+      - 'tests/seasons/brazil_2026_access_stage_test.c'
+      - 'tests/seasons/brazil_2026_fixture_tracker_test.c'
+      - 'tests/seasons/brazil_2026_fixture_audit_test.c'
+      - 'src/recomp_rt/win/season_kind_cup_breaks.c'
+      - 'tests/seasons/brazil_2026_stage_gate_test.c'
+      - 'src/recomp_rt/win/brazil_2026_calendar.h'
+      - 'src/recomp_rt/win/brazil_2026_schedule.h'
+      - 'tests/seasons/brazil_2026_schedule_test.c'
+      - 'tests/seasons/brazil_2026_calendar_test.c'
+      - 'src/recomp_rt/win/season_sizes.c'
+      - 'src/recomp_rt/win/season_sizes.h'
+      - 'src/recomp_rt/win/season_uefa_league.c'
+      - 'src/recomp_rt/win/season_screen.c'
+      - 'tests/seasons/brazil_2026_league_test.c'
+      - 'CMakeLists.txt'
+      - 'tests/seasons/brazil_2026_promotion_test.c'
+      - 'tests/seasons/test_brazil_2026_rules.py'
+      - 'docs/research/rules-0.6.0/bra.tsv'
+      - '.github/workflows/brasileirao-2026.yml'
+  workflow_dispatch:
+
+jobs:
+  standalone-rules:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify static 2026 A/B season rules
+        run: python3 tests/seasons/test_brazil_2026_rules.py
+      - name: Compile and exercise two-tie promotion adapter
+        run: |
+          cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
+            tests/seasons/brazil_2026_promotion_test.c -o /tmp/brasileirao-2026-rules
+          /tmp/brasileirao-2026-rules
+      - name: Verify Premier-League-style double round robin and no title playoffs
+        run: |
+          cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
+            tests/seasons/brazil_2026_league_test.c -o /tmp/brasileirao-2026-league
+          /tmp/brasileirao-2026-league
+      - name: Syntax-check read-only Brazilian runtime audit hook
+        run: |
+          cc -std=c11 -fsyntax-only -Isrc/recomp_rt -Isrc/recomp_rt/win \
+            src/recomp_rt/win/season_sizes.c
+      - name: Validate coexistence with states, Copa do Brasil and continental cups
+        run: |
+          cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
+            tests/seasons/brazil_2026_calendar_test.c -o /tmp/brasileirao-2026-calendar
+          /tmp/brasileirao-2026-calendar
+      - name: Plan 380 Serie A/B fixtures around existing state and cup matches
+        run: |
+          cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
+            tests/seasons/brazil_2026_schedule_test.c -o /tmp/brasileirao-2026-schedule
+          /tmp/brasileirao-2026-schedule
+      - name: Verify fail-closed Serie A legacy title-stage removal guard
+        run: |
+          cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
+            tests/seasons/brazil_2026_stage_gate_test.c -o /tmp/brasileirao-stage-gate
+          /tmp/brasileirao-stage-gate
+      - name: Verify nation-sensitive start-date preview
+        run: |
+          # This screen depends on SDL2; the standalone rules job has no SDL2.
+          # Compile checking is reserved for the full game build.
+          ! grep -q 'Starts July %d' src/recomp_rt/win/season_screen.c
+          grep -q 'Start date follows chosen leagues' src/recomp_rt/win/season_screen.c
+      - name: Verify experimental live 38-date generator syntax and guards
+        run: |
+          cc -std=c11 -fsyntax-only -Isrc/recomp_rt -Isrc/recomp_rt/win \
+            src/recomp_rt/win/season_bra_calendar.c
+          cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
+            tests/seasons/brazil_2026_runtime_gate_test.c -o /tmp/brasileirao-runtime-gate
+          /tmp/brasileirao-runtime-gate
+      - name: Check post-fixtures title-stage integration compiles
+        run: |
+          cc -std=c11 -fsyntax-only -Isrc/recomp_rt -Isrc/recomp_rt/win \
+            src/recomp_rt/win/season_uefa_league.c
+      - name: Mock original engine and verify all 38 matchday records
+        run: |
+          cc -D_POSIX_C_SOURCE=200809L -std=c11 -Wall -Wextra -Werror -pedantic -O2 \
+            -Isrc/recomp_rt -Isrc/recomp_rt/win \
+            tests/seasons/brazil_2026_runtime_template_test.c -o /tmp/brasileirao-runtime-template
+          /tmp/brasileirao-runtime-template
+      - name: Audit real fixture-manager add callbacks in simulated 380-match seasons
+        run: |
+          cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
+            tests/seasons/brazil_2026_fixture_tracker_test.c -o /tmp/brasileirao-fixture-tracker
+          /tmp/brasileirao-fixture-tracker
+          cc -D_POSIX_C_SOURCE=200809L -std=c11 -Wall -Wextra -Werror -pedantic -O2 \
+            -Isrc/recomp_rt -Isrc/recomp_rt/win \
+            tests/seasons/brazil_2026_fixture_audit_test.c -o /tmp/brasileirao-fixture-audit
+          /tmp/brasileirao-fixture-audit
+          cc -std=c11 -fsyntax-only -Isrc/recomp_rt -Isrc/recomp_rt/win \
+            src/recomp_rt/win/brazil_2026_fixture_audit.c
+          cc -std=c11 -fsyntax-only -Isrc/recomp_rt -Isrc/recomp_rt/win \
+            src/recomp_rt/win/season_kind_cup_breaks.c
+      - name: Mock standalone two-tie one-round Serie B stage with no final
+        run: |
+          cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
+            tests/seasons/brazil_2026_access_gate_test.c -o /tmp/brasileirao-access-gate
+          /tmp/brasileirao-access-gate
+          cc -D_POSIX_C_SOURCE=200809L -std=c11 -Wall -Wextra -Werror -pedantic -O2 \
+            -Isrc/recomp_rt -Isrc/recomp_rt/win \
+            tests/seasons/brazil_2026_access_stage_test.c -o /tmp/brasileirao-access-stage
+          /tmp/brasileirao-access-stage
+          cc -std=c11 -fsyntax-only -Isrc/recomp_rt -Isrc/recomp_rt/win \
+            src/recomp_rt/win/brazil_2026_access.c
+      - name: Verify better ranked Brazilian team wins 2-leg tied aggregate
+        run: |
+          cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
+            tests/seasons/brazil_2026_promotion_round_test.c -o /tmp/brazil-cbf-tiebreak
+          /tmp/brazil-cbf-tiebreak
+      - name: Validate four up and four down at Brazilian promotion chain
+        run: |
+          cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
+            tests/seasons/brazil_2026_access_promotions_test.c -o /tmp/brazil-access-promotions
+          /tmp/brazil-access-promotions
+          python3 -m py_compile tools/recomp/brazil_2026_cup_tiebreak_audit.py
+      - name: Note test limits
+        run: |
+          echo 'Pass confirms standalone source-level rules only.'
+          echo 'The original game executable and season rollover are NOT covered.'

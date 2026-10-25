@@ -26,6 +26,9 @@
 #include "season_uefa_league.h"
 #include "season_cups.h"
 #include "season_divisions_ita.h"
+#include "season_sizes.h"  /* safe post-fixture Serie A title-stage gate */
+#include "brazil_2026_fixture_audit.h"
+#include "brazil_2026_access.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -138,12 +141,18 @@ RT_WRAP(006835c0, league_create_fixtures)
         return;
     }
     uint32_t league = cpu.ecx;
+    brazil_fixture_audit_begin(league); /* opt-in: 380 directed match attempts */
     season_records_league_log(league, rd32(g_mem, cpu.esp));      /* test log of slice 15b's fix */
     if (pending_stage && league == pending_stage && pending_list) {
         wr32(g_mem, league + 0xea, pending_list);
         pending_stage = pending_list = 0;
     }
     o_006835c0();
+    if (!rt_unwinding) {
+        brazil_fixture_audit_end(league); /* count only accepted inserts */
+        brazil_2026_access_after_fixtures(league); /* opt-in Serie B */
+        season_sizes_brazil_after_fixtures(league); /* opt-in Serie A */
+    }
 }
 
 /* The fixed list of the draw (new[] of the game: the count, then the entries), or 0. */
