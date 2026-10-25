@@ -372,6 +372,15 @@ static void brazil_2026_remove_title_stage_if_ready(uint32_t obj)
     fprintf(stderr, "recomp: Brazil 2026: 38-date Serie A verified, old title playoff disabled\n");
 }
 
+/* A League::create_fixtures callback can finally see the fully built 38-date
+ * list. Re-run only the narrow Serie A stage guard, NOT the broader rules
+ * setup: rerunning set_up_rules here would disturb the new fixture table.
+ */
+void season_sizes_brazil_after_fixtures(uint32_t obj)
+{
+    if (!rt_unwinding) brazil_2026_remove_title_stage_if_ready(obj);
+}
+
 /* Read-only runtime probe for the Brazilian legacy fixture/stage builders.
  * The original classes still allocate a 27-date one-meeting calendar and an
  * eight-team title playoff. Do not force +0x2c to zero before their fixture
