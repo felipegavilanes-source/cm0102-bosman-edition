@@ -15,6 +15,11 @@ on:
       - 'src/recomp_rt/win/brazil_2026_fixture_tracker.h'
       - 'src/recomp_rt/win/brazil_2026_fixture_audit.h'
       - 'src/recomp_rt/win/brazil_2026_fixture_audit.c'
+      - 'src/recomp_rt/win/brazil_2026_access.c'
+      - 'src/recomp_rt/win/brazil_2026_access.h'
+      - 'src/recomp_rt/win/brazil_2026_access_gate.h'
+      - 'tests/seasons/brazil_2026_access_gate_test.c'
+      - 'tests/seasons/brazil_2026_access_stage_test.c'
       - 'tests/seasons/brazil_2026_fixture_tracker_test.c'
       - 'tests/seasons/brazil_2026_fixture_audit_test.c'
       - 'src/recomp_rt/win/season_kind_cup_breaks.c'
@@ -45,6 +50,11 @@ on:
       - 'src/recomp_rt/win/brazil_2026_fixture_tracker.h'
       - 'src/recomp_rt/win/brazil_2026_fixture_audit.h'
       - 'src/recomp_rt/win/brazil_2026_fixture_audit.c'
+      - 'src/recomp_rt/win/brazil_2026_access.c'
+      - 'src/recomp_rt/win/brazil_2026_access.h'
+      - 'src/recomp_rt/win/brazil_2026_access_gate.h'
+      - 'tests/seasons/brazil_2026_access_gate_test.c'
+      - 'tests/seasons/brazil_2026_access_stage_test.c'
       - 'tests/seasons/brazil_2026_fixture_tracker_test.c'
       - 'tests/seasons/brazil_2026_fixture_audit_test.c'
       - 'src/recomp_rt/win/season_kind_cup_breaks.c'
@@ -139,6 +149,17 @@ jobs:
             src/recomp_rt/win/brazil_2026_fixture_audit.c
           cc -std=c11 -fsyntax-only -Isrc/recomp_rt -Isrc/recomp_rt/win \
             src/recomp_rt/win/season_kind_cup_breaks.c
+      - name: Mock standalone two-tie one-round Serie B stage with no final
+        run: |
+          cc -std=c99 -Wall -Wextra -Werror -pedantic -O2 \
+            tests/seasons/brazil_2026_access_gate_test.c -o /tmp/brasileirao-access-gate
+          /tmp/brasileirao-access-gate
+          cc -D_POSIX_C_SOURCE=200809L -std=c11 -Wall -Wextra -Werror -pedantic -O2 \
+            -Isrc/recomp_rt -Isrc/recomp_rt/win \
+            tests/seasons/brazil_2026_access_stage_test.c -o /tmp/brasileirao-access-stage
+          /tmp/brasileirao-access-stage
+          cc -std=c11 -fsyntax-only -Isrc/recomp_rt -Isrc/recomp_rt/win \
+            src/recomp_rt/win/brazil_2026_access.c
       - name: Note test limits
         run: |
           echo 'Pass confirms standalone source-level rules only.'
